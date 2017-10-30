@@ -1,0 +1,4 @@
+# Python class symbolic objects and things
+class animal:
+      def __init__(self, name):
+      	  

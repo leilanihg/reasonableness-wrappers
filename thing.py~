@@ -1,0 +1,5 @@
+class LivingThing:
+    def __init__(self, name):
+        self.name = name
+        self.habitat = habitat
+        self.eats = eats

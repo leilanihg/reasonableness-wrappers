@@ -1,0 +1,80 @@
+import argparse
+import requests
+
+def find_hierarchy_path(start, end, count=0, path=[]):
+    limit = 5 # May want to be global
+
+    #cnfinder = AssertionFinder()
+    #path = path + [start]
+    #edges = cnfinder.query({'node': '/c/en/penguin', 'rel': '/r/IsA'})
+
+    obj = requests.get('http://api.conceptnet.io/c/en/'+start+ \
+                           '?rel=/r/IsA&limit=1000').json()
+    edges = obj['edges']
+    
+    if start == end:
+        return path
+    shortest = None
+    for edge in edges:
+        node2 = edge['start']['label']
+        node1 = edge['end']['label']
+        #print(node2 + " " + node1)
+
+        # Need to replace the spaces with _
+        node2.replace(" ", "_") 
+        node1.replace(" ", "_")
+        if node1 == start:
+            node = node2
+        else:
+            node = node1
+        if node not in path and count<limit:
+            if(count < limit):
+                newpath = find_hierarchy_path(node, end, (count+1), path)
+                if newpath:
+                    if not shortest or len(newpath) < len(shortest):
+                        shortest = newpath
+            else: return null
+    return shortest
+
+# Finds the specific anchor point or type of a specific word
+def find_anchor_point(word):
+    concepts = ['animal', 'plant', 'object', 'place']
+    for concept in concepts:
+        relation = isA(word, concept)
+
+# More generic function for detecting relationship
+# TODO - might want to specifically check for IsA
+def isA(word, concept):
+    # First check if there's a direct conneciton
+    #http://conceptnet.io/c/en/penguin?rel=/r/IsA&limit=1000
+    obj = requests.get('http://api.conceptnet.io/query?node=/c/en/'+word+'&other=/c/en/'+concept).json()
+    edges = obj['edges']
+
+    if(not edges):
+        #print("going through the hiearchy to find "+concept)
+        return find_hierarchy_path(word, concept)
+    else: return (word, 'IsA', concept)
+
+# Finds the specific anchor point or type of a specific word
+def find_anchor_point(word):
+    concepts = ['animal', 'plant', 'object', 'place']
+    for concept in concepts:
+        relation = isA(word, concept)
+
+# Explains whether the triple is reasonable or not
+def explain(triple):
+    [subject, verb, object] = triple
+    find_anchor_point(subject)
+    print(subject + verb + object)
+
+# May need a more detailed interface
+def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument('triple', nargs='+',
+                    help='subject verb object triple separated by whitespace')
+
+    args = parser.parse_args()
+    explain(args.triple)
+
+if __name__ == "__main__":
+    main()
