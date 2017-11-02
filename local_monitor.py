@@ -15,10 +15,19 @@ class LocalMonitor:
     """A simple monitor class that stores premises, and checks for 
     inconsistencies"""
     def __init__(self, subject, verb, object, premises=[]):
-        self.subject = subject # TODO - make object
-        self.verb = WordNetLemmatizer().lemmatize(verb,'v') # to do - make object
-        self.object = object # TODO - make object
+        self.subject = subject
+        self.subject_anchor = anchors.make_anchor_point(subject) 
+        self.verb = verb
+        self.verb_anchor = anchors.verb(subject, WordNetLemmatizer().lemmatize(verb,'v')) 
+        self.object = object
+        self.object_anchor = anchors.make_anchor_point(object) 
         self.premises = premises
+
+        self.subject_anchor.setPremises()
+        self.object_anchor.setPremises()
+        self.addPremises(self.subject_anchor.getPremises())
+        self.addPremises(self.verb_anchor.premises)
+        self.addPremises(self.object_anchor.getPremises())
 
     def addPremises(self, new_premises):
         for premise in new_premises:
@@ -307,14 +316,6 @@ def search_relation(word, relation):
 def explain(triple):
     [subject, verb, object] = triple
     monitor = LocalMonitor(subject, verb, object)
-    subject_anchor = anchors.make_anchor_point(subject)
-    object_anchor = anchors.make_anchor_point(object)
-    verb_type = anchors.verb(verb, subject)
-    subject_anchor.setPremises()
-    object_anchor.setPremises()
-    monitor.addPremises(subject_anchor.getPremises())
-    monitor.addPremises(verb_type.premises)
-    monitor.addPremises(object_anchor.getPremises())
     monitor.detectConflicts()
 
 # May need a more detailed interface
