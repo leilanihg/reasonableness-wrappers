@@ -32,21 +32,20 @@ class LocalMonitor:
     def addPremises(self, new_premises):
         for premise in new_premises:
             self.premises.append(premise)
+    
+    def pp_premise(self):
+        for premise in self.premises:
+            print(premise)
 
     def detectConflicts(self):
         # Conflicts in relations
-        split_relations = []
-        for key,group in itertools.groupby(self.premises,operator.itemgetter(1)):
-            split_relations.append(list(group))
-        for relations in split_relations:
+        splits = split_relations(self.premises)
+        for relations in splits:
             if relation_conflict(relations):
                 print("detected")
                 return True
-        
-        # Conflicts with the verb
         verb_premises = filter(lambda x: isinstance(x[2], bool), self.premises)
-        #for prem in verb_premises:
-        #    print(prem)#print(len(verb_premises)      
+
         if check_verb(verb_premises):
             print("This situation ", self.subject, self.verb, self.object, \
                       "is inconsistent.")
@@ -62,6 +61,14 @@ class LocalMonitor:
 
     def removeConflict(self, premise):
         self.premises.remove(premise)
+
+def split_relations(premises):
+    splits = []
+    # First need to sort
+    premises.sort(key=operator.itemgetter(1))
+    for key,group in itertools.groupby(premises,operator.itemgetter(1)):
+        splits.append(list(group))
+    return splits
 
 def check_verb(verb_premise):
     for rel_1 in verb_premise:
