@@ -1,50 +1,7 @@
 # Python class symbolic objects and things
 from sympy import *
 from local_monitor import *
-
-# MAY NOT BE NECESSARY 
-# Builds a relationship dictionary from a txt file
-class symbols:
-      def build_relation_dictionary():
-            relationList = []
-            with open('relations.txt', 'r') as f:
-                  for line in f:
-                        elements = ""
-                        return relationList
-
-                  # Relations in ConceptNet5
-# Found here: https://github.com/commonsense/conceptnet5/wiki/Relations
-# TODO - May want to build this as a textfile 
-      def build_symbolic_relations():
-            RelatedTo = symbols('RelatedTo')
-            ExternalURL = symbols('ExternalURL') # doesn't seem relevant
-            FormOf = symbols('FormOf')
-            IsA = symbols('IsA')
-            PartOf = symbols('PartOf')
-            HasA = symbols('HasA')
-            UsedFor = symbols('UsedFor')
-            CapableOf = symbols('CapableOf')
-            AtLocation = symbols('AtLocation')
-            Causes = symbols('Causes')
-
-    # These don't seem super relevant to us
-            HasSubevent = symbols('HasSubevent')
-            HasFirstSubevent = symbols('HasFirstSubevent')
-            HasLastSubevent = symbols('HasLastSubevent')
-            HasPrerequisite = symbols('HasPrerequisite')
-            HasProperty = symbols('HasProperty')
-            MotivatedByGoal = symbols('MotivatedByGoal')
-            ObstructedBy = symbols('ObstructedBy')
-            Desires = symbols('Desires')
-            CreatedBy = symbols('CreatedBy')
-            Synonym = symbols('Synonym')
-            Antonym = symbols('Antonym')
-            DerivedFrom = symbols('DerivedFrom')
-            SymbolOf = symbols('SymbolOf')
-            DefinedAs = symbols('DefinedAs')
-            Entails = symbols('Entails')
-            MannerOf = symbols('MannerOf')
-            LocatedNear = symbols('LocatedNear')
+from premise import *
 
 def make_anchor_point(name):
       binding = find_anchor_point(name)
@@ -68,7 +25,9 @@ class verb:
             self.premises = []
             self.setInitialPremises()
       def setInitialPremises(self):
-            self.premises.append((self.subject, self.type, True))
+            # This may need some special case
+            #self.premises.append(Premise(self.subject, self.type, True))
+            return
 
 # This 
 class person:
@@ -95,12 +54,20 @@ class animal:
             
             # TODO - Need to put in a check for empty
             for place in self.habitat:
-                  self.premises.append((self.name, 'AtLocation', place))
+                  # make a new premise
+                  # append to premises
+                  new_premise = Premise(self.name, 'AtLocation', place)
+                  # append to premises
+                  self.premises.append(new_premise)
+                  #self.premises.append((self.name, 'AtLocation', place))
             for food in self.eats:
-                  self.premises.append((self.name, 'eats', food))
+                  new_premise = Premise(self.name, 'eats', food)
+                  self.premises.append(new_premise)
+                  #self.premises.append((self.name, 'eats', food))
       def setInitialPremises(self):
-            self.premises.append((self.name, 'IsA', 'animal'))
-            self.premises.append((self.name, 'action', True))
+            # Changed these to premise objects as well
+            self.premises.append(Premise(self.name, 'IsA', 'animal'))
+            self.premises.append(Premise(self.name, 'action', True))
       def getPremises(self):
             return self.premises
       def writeSummary(self):
@@ -127,10 +94,10 @@ class object:
       def setPremises(self):
             self.location = search_relation(self.name, 'AtLocation')
             for place in self.location:
-                  self.premises.append((self.name, 'AtLocation', place))
+                  self.premises.append(Premise(self.name, 'AtLocation', place))
       def setInitialPremises(self):
-            self.premises.append((self.name, 'IsA', 'object'))
-            self.premises.append((self.name, 'action', False))
+            self.premises.append(Premise(self.name, 'IsA', 'object'))
+            self.premises.append(Premise(self.name, 'action', False))
       def getPremises(self):
             return self.premises
       def writeSummary(self):
@@ -148,10 +115,10 @@ class place:
       def setPremises(self):
             self.location = search_relation(self.name, 'AtLocation')
             for place in self.location:
-                  self.premises.append((self.name, 'AtLocation', place))
+                  self.premises.append(Premise(self.name, 'AtLocation', place))
       def setInitialPremises(self):
-            self.premises.append((self.name, 'IsA', 'place'))
-            self.premises.append((self.name, 'action', False))
+            self.premises.append(Premise(self.name, 'IsA', 'place'))
+            self.premises.append(Premise(self.name, 'action', False))
       def getPremises(self):
             return self.premises
       def writeSummary(self):

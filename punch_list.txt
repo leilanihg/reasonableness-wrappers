@@ -1,0 +1,7 @@
+1.  Premise hierarchy (for relations)
+2.  Anchor point hierarchy subclasses - inherited
+3.  Split relation to dictionary
+4.  Adding premises (ranking function)
+5.  Weights of concepts
+6.  Concept to context (e.g. zoo forcese consistency)
+7.  Relation 'HasA needs to flip the relation

@@ -41,9 +41,9 @@ class LocalMonitor:
         # Conflicts in relations
         splits = split_relations(self.premises)
         for relations in splits:
-            if relation_conflict(relations):
-                print("detected")
-                return True
+            conflicts = relation_conflict(relations)
+            if conflicts:
+                explain_relation_conflict(conflicts)
         verb_premises = filter(lambda x: isinstance(x[2], bool), self.premises)
 
         if check_verb(verb_premises):
@@ -55,7 +55,6 @@ class LocalMonitor:
         #(move != not move conflict)
         # eat != not eat object
         
-
         # Conflict with location (preposition verb)
         return False
 
@@ -64,8 +63,11 @@ class LocalMonitor:
 
 def split_relations(premises):
     splits = []
-    # First need to sort
-    premises.sort(key=operator.itemgetter(1))
+    # First need to sort - Don't get why
+    for premise in premises:
+        premise.print_summary()
+        #print(premise.relation)
+    premises.sort(key=lambda x: x.relation.name)
     for key,group in itertools.groupby(premises,operator.itemgetter(1)):
         splits.append(list(group))
     return splits
@@ -76,13 +78,24 @@ def check_verb(verb_premise):
             if rel_1[0] == rel_2[0] and has_any_edge(rel_1[1], rel_2[1]) and not rel_1[2] == rel_2[2]:
                 return [rel_1, rel_2]
 
+# Only returns one conflict as of now
 def relation_conflict(relations):
+    conflicts = []
     for rel_1 in relations:
         for rel_2 in relations:
             if isinstance(rel_1[2], str) and isinstance(rel_2[2], str):
-                if not rel_1[0] == rel_2[0] and  has_any_edge(rel_1[2], rel_1[2]):
+                if not rel_1[0] == rel_2[0] and not has_any_edge(rel_1[2], rel_2[2]):
                     print(rel_1, "not close to ", rel_2)
-                    return False
+                    return [rel_1, rel_2]
+#conflicts.append(rel_1)
+                    #conflicts.append(rel_2)
+    return conflicts
+
+def explain_relation_conflict(relations):
+    [rel1, rel2] = relations
+    print_summary(rel1)
+    print("while")
+    print_summary(rel2)
 
 # Used to printint to sderr
 def eprint(*args, **kwargs):
