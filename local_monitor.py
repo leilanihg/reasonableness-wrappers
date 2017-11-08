@@ -6,6 +6,7 @@ import itertools
 import operator
 from conflicts import *
 from nltk.stem.wordnet import WordNetLemmatizer
+from premise import *
 
 limit = 3
 debug = False
@@ -15,6 +16,7 @@ class LocalMonitor:
     """A simple monitor class that stores premises, and checks for 
     inconsistencies"""
     def __init__(self, subject, verb, object, premises=[]):
+        self.input = "%s %s %s" % (subject, verb, object)
         self.subject = subject
         self.subject_anchor = anchors.make_anchor_point(subject) 
         self.verb = verb
@@ -22,6 +24,8 @@ class LocalMonitor:
         self.object = object
         self.object_anchor = anchors.make_anchor_point(object) 
         self.premises = premises
+        self.conflicts = None
+        self.state = State.REASONABLE
 
         self.subject_anchor.setPremises()
         self.object_anchor.setPremises()
@@ -37,12 +41,21 @@ class LocalMonitor:
         for premise in self.premises:
             print(premise)
 
+    def print_header(self):
+        print("The input statement: %s" % (self.input))
+        print("Parsed as : (%s, %s, %s)" % (self.subject, self.verb_anchor.name, self.object))
+        print("\nThis perception is %s)" % (self.state.name))
+        print("   Using data from ConceptNet 5")
+
     def detectConflicts(self):
         # Conflicts in relations
         splits = split_premises(self.premises)
-        conflicts = relation_conflict(splits)
-        if conflicts:
-            explain_relation_conflict(conflicts)
+        self.conflicts = relation_conflict(splits)
+        if self.conflicts:
+            self.state = State.UNREASONABLE
+        self.explain()
+#if conflicts:
+        #    explain_relation_conflict(conflicts)
         # Split into moves and actions
         # (move != not move conflict)
         # eat != not eat object
@@ -53,10 +66,17 @@ class LocalMonitor:
     def removeConflict(self, premise):
         self.premises.remove(premise)
 
+    def explain(self):
+        self.print_header()
+        if self.conflicts:
+            for rel in self.conflicts:
+                [rel1, rel2] = rel
+                print(rel1.print_summary(), "not close to ",rel2.print_summary())
+        else: # Print summary if reasonable
+
 # Splits premises into a dictionary by relation
 def split_premises(premises):
     relation_dict = {}
-    #premises.sort(key=lambda x: x.relation.name)
     for premise in premises:
         if premise.relation in relation_dict:
             relation_dict[premise.relation].append(premise)
@@ -72,16 +92,19 @@ def relation_conflict(rel):
             for premise2 in premises:
                 if isinstance(premise1.result, str) and isinstance(premise2.result, str):
                     if not premise1.concept == premise2.concept and not has_any_edge(premise1.result, premise2.result):
-                        return [premise1, premise2]
+                        conflicts.append((premise1, premise2))
+                # This is for verbs
+                elif isinstance(premise1.result, bool) and isinstance(premise2.result, bool): 
+                    if not premise1.result == premise2.result:
+                        conflicts.append((premise1, premise2))
     return conflicts
 
 def explain_relation_conflict(relations):
     print("THE INPUT STATEMEMENT IS UNREASONABLE")
     print("  Using data from ConceptNet5")
-    [rel1, rel2] = relations
-    rel1.print_summary()
-    print(" not close to ")
-    rel2.print_summary()
+    for rel in relations:
+        [rel1, rel2] = rel
+        print(rel1.print_summary(), "not close to ",rel2.print_summary())
 
 # Used to printint to sderr
 def eprint(*args, **kwargs):
@@ -331,6 +354,7 @@ def explain(triple):
     monitor.detectConflicts()
 
 # May need a more detailed interface
+# TODO - Need verbose 
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('triple', nargs='+',

@@ -18,7 +18,7 @@ def make_anchor_point(name):
       else: return confusion(name)
 
 class verb:
-      def __init__(self, name, subject):
+      def __init__(self, subject, name):
             self.name = name
             self.subject = subject
             self.type = find_verb_type(name)

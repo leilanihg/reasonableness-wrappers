@@ -10,7 +10,13 @@ class Premise:
         # self.reason = 'physcis, ....
 
     def print_summary(self):
-        print(self.concept,self.relation.value,self.result) 
+        builder = ''
+        builder.join(self.concept).join(' ')
+        builder.join(self.relation.value).join(' ')
+        builder.join(self.result)
+        return "%s %s %s" % (self.concept, self.relation.value, self.result)
+#        return ''.join(self.concept).join(self.relation.value).join(self.result)
+#        return self.concept,self.relation.value,self.result
 
 # May need a contridction method    
 #def print_contradiction(self):
@@ -36,6 +42,7 @@ def getRelationEnum(rel_string):
 # Relations in ConceptNet5
 # Found here: https://github.com/commonsense/conceptnet5/wiki/Relations
 # TODO - May want to build this as a textfile 
+# TODO - May want to make this a dictionary
 class Relation(Enum):
     RelatedTo = "has/have some positive relationship to "
     ExternalURL = "points to a URL outside of ConceptNet"
@@ -71,6 +78,11 @@ class Relation(Enum):
     Entails = symbols('Entails')
     MannerOf = symbols('MannerOf')
     LocatedNear = symbols('LocatedNear')
+
+class State(Enum):
+    REASONABLE = "reasonable"
+    UNREASONABLE = "unreasonable"
+    DONT_CARE = "don't care"
 
 def main():
     for relation in Relation:

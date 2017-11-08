@@ -5,3 +5,4 @@
 5.  Weights of concepts
 6.  Concept to context (e.g. zoo forcese consistency)
 7.  Relation 'HasA needs to flip the relation
+8.  Verbose printing for debugging 
