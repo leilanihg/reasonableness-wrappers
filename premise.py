@@ -10,7 +10,11 @@ class Premise:
         # self.reason = 'physcis, ....
 
     def print_summary(self):
-        print(self.concept, self.relation, self.result) 
+        print(self.concept,self.relation.value,self.result) 
+
+# May need a contridction method    
+#def print_contradiction(self):
+        
 
 # Builds a relationship dictionary from a txt file
 # TODO - may want to use this in the future
@@ -41,7 +45,7 @@ class Relation(Enum):
     HasA = " " # NEED TO FLIP
     UsedFor = " is/are used for "
     CapableOf = " can typically do for " 
-    AtLocation = " is/are typically found in location "
+    AtLocation = " which is typically found in location "
     Causes = " cause(s) " 
     
     # Verb actions - I created 

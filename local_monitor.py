@@ -39,20 +39,12 @@ class LocalMonitor:
 
     def detectConflicts(self):
         # Conflicts in relations
-        splits = split_relations(self.premises)
-        for relations in splits:
-            conflicts = relation_conflict(relations)
-            if conflicts:
-                explain_relation_conflict(conflicts)
-        verb_premises = filter(lambda x: isinstance(x[2], bool), self.premises)
-
-        if check_verb(verb_premises):
-            print("This situation ", self.subject, self.verb, self.object, \
-                      "is inconsistent.")
-            print("Verb - ", self.verb, "Is an action verb")
-        
+        splits = split_premises(self.premises)
+        conflicts = relation_conflict(splits)
+        if conflicts:
+            explain_relation_conflict(conflicts)
         # Split into moves and actions
-        #(move != not move conflict)
+        # (move != not move conflict)
         # eat != not eat object
         
         # Conflict with location (preposition verb)
@@ -61,41 +53,35 @@ class LocalMonitor:
     def removeConflict(self, premise):
         self.premises.remove(premise)
 
-def split_relations(premises):
-    splits = []
-    # First need to sort - Don't get why
+# Splits premises into a dictionary by relation
+def split_premises(premises):
+    relation_dict = {}
+    #premises.sort(key=lambda x: x.relation.name)
     for premise in premises:
-        premise.print_summary()
-        #print(premise.relation)
-    premises.sort(key=lambda x: x.relation.name)
-    for key,group in itertools.groupby(premises,operator.itemgetter(1)):
-        splits.append(list(group))
-    return splits
-
-def check_verb(verb_premise):
-    for rel_1 in verb_premise:
-        for rel_2 in verb_premise:
-            if rel_1[0] == rel_2[0] and has_any_edge(rel_1[1], rel_2[1]) and not rel_1[2] == rel_2[2]:
-                return [rel_1, rel_2]
+        if premise.relation in relation_dict:
+            relation_dict[premise.relation].append(premise)
+        else:
+            relation_dict[premise.relation] = [premise]
+    return relation_dict
 
 # Only returns one conflict as of now
-def relation_conflict(relations):
+def relation_conflict(rel):
     conflicts = []
-    for rel_1 in relations:
-        for rel_2 in relations:
-            if isinstance(rel_1[2], str) and isinstance(rel_2[2], str):
-                if not rel_1[0] == rel_2[0] and not has_any_edge(rel_1[2], rel_2[2]):
-                    print(rel_1, "not close to ", rel_2)
-                    return [rel_1, rel_2]
-#conflicts.append(rel_1)
-                    #conflicts.append(rel_2)
+    for key,premises in rel.items():
+        for premise1 in premises:
+            for premise2 in premises:
+                if isinstance(premise1.result, str) and isinstance(premise2.result, str):
+                    if not premise1.concept == premise2.concept and not has_any_edge(premise1.result, premise2.result):
+                        return [premise1, premise2]
     return conflicts
 
 def explain_relation_conflict(relations):
+    print("THE INPUT STATEMEMENT IS UNREASONABLE")
+    print("  Using data from ConceptNet5")
     [rel1, rel2] = relations
-    print_summary(rel1)
-    print("while")
-    print_summary(rel2)
+    rel1.print_summary()
+    print(" not close to ")
+    rel2.print_summary()
 
 # Used to printint to sderr
 def eprint(*args, **kwargs):
@@ -314,9 +300,15 @@ def has_IsA_edge(word, concept):
         start = edge['start']['label'].lower()
         end = edge['end']['label'].lower()
 
-        if(search_equals(word, start) and concept in end.lower()):# == concept.lower()):
+        if(search_equals(word, start) and isA_equals(concept, end.lower())):# == concept.lower()):
             return True
     return False
+
+# Phrases don't always count
+def isA_equals(concept, phrase):
+    if concept in phrase:
+        return True
+    else: return False
 
 # TODO - something strange about the query request
 # So hard-coded in a check for the relation
