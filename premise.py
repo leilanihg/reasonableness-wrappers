@@ -22,6 +22,17 @@ class Premise:
 #def print_contradiction(self):
         
 
+# Splits premises into a dictionary by relation
+def split_premises(premises):
+    relation_dict = {}
+    for premise in premises:
+        if premise.relation in relation_dict:
+            relation_dict[premise.relation].append(premise)
+        else:
+            relation_dict[premise.relation] = [premise]
+    return relation_dict
+
+
 # Builds a relationship dictionary from a txt file
 # TODO - may want to use this in the future
 def build_relation_dictionary():
