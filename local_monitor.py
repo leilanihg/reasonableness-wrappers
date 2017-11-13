@@ -3,6 +3,7 @@ import requests
 import sys
 import anchors
 import itertools
+import logging
 import operator
 from conflicts import *
 from nltk.stem.wordnet import WordNetLemmatizer
@@ -10,14 +11,14 @@ from premise import *
 from search import *
 
 limit = 3
-debug = False
 query_prefix = 'http://api.conceptnet.io/c/en/'
+debug
 
 class LocalMonitor:
     """A simple monitor class that stores premises, and checks for 
     inconsistencies"""
     def __init__(self, subject, verb, object, premises=[]):
-        self.input = "%s %s %s" % (subject, verb, object)
+        self.input = "%s %s %s" % (subject, verb, object) # TODO this may be changed
         self.subject = subject
         self.subject_anchor = anchors.make_anchor_point(subject) 
         self.verb = verb
@@ -34,13 +35,19 @@ class LocalMonitor:
         self.addPremises(self.verb_anchor.premises)
         self.addPremises(self.object_anchor.getPremises())
 
+        print(debug)
+        if debug:
+            print("DEBUG MODE")
+        logging.debug('Printing Anchor Points')
+        logging.debug('')
+
     def addPremises(self, new_premises):
         for premise in new_premises:
             self.premises.append(premise)
     
     def pp_premise(self):
         for premise in self.premises:
-            print(premise)
+            print(premise.print_summary())
 
     def print_header(self):
         print("The input statement: %s" % (self.input))
@@ -55,14 +62,6 @@ class LocalMonitor:
         if self.conflicts:
             self.state = State.UNREASONABLE
         self.explain()
-#if conflicts:
-        #    explain_relation_conflict(conflicts)
-        # Split into moves and actions
-        # (move != not move conflict)
-        # eat != not eat object
-        
-        # Conflict with location (preposition verb)
-        return False
 
     def removeConflict(self, premise):
         self.premises.remove(premise)
@@ -72,8 +71,9 @@ class LocalMonitor:
         if self.conflicts:
             for rel in self.conflicts:
                 [rel1, rel2] = rel
-                print(rel1.print_summary(), "not close to ",rel2.print_summary())
-        else: # Print summary if reasonable
+                print(rel1.print_summary(),"is not close to",rel2.print_summary())
+        else: 
+            print("REASONABLE TO DO")# Print summary if reasonable
 
 # Finds the specific anchor point or type of a specific word
 def find_anchor_point(word):
@@ -245,11 +245,19 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('triple', nargs='+',
                     help='subject verb object triple separated by whitespace')
-    parser.add_argument('--debug', action='store_true', 
+    parser.add_argument("-d", "--debug", action='store_true', 
                         help='print debug messages to stderr')
-
+#    parser.add_argument("-v", "--verbose", help="increase output verbosity",
+#                    action="store_true")
+    
     args = parser.parse_args()
+    #debug = args.verbose
     debug = args.debug
+    print(debug)
+#    if args.verbose:
+#        logging.basicConfig(level=logging.DEBUG) # This does things for request
+
+    #logging.debug('Only shown in debug mode')    
     explain(args.triple)
 
 if __name__ == "__main__":
