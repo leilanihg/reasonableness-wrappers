@@ -14,9 +14,7 @@ class Premise:
         builder.join(self.concept).join(' ')
         builder.join(self.relation.value).join(' ')
         builder.join(self.result)
-        return "%s %s %s" % (self.concept, self.relation.value, self.result)
-#        return ''.join(self.concept).join(self.relation.value).join(self.result)
-#        return self.concept,self.relation.value,self.result
+        return "%s%s %s" % (self.concept, self.relation.value, self.result)
 
 # May need a contridction method    
 #def print_contradiction(self):
@@ -52,7 +50,7 @@ class Relation(Enum):
     HasA = " " # NEED TO FLIP
     UsedFor = " is/are used for "
     CapableOf = " can typically do for " 
-    AtLocation = " which is typically found in location "
+    AtLocation = ", which is typically found in location:"
     Causes = " cause(s) " 
     
     # Verb actions - I created 
