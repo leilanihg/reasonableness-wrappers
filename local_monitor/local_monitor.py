@@ -69,11 +69,28 @@ class LocalMonitor:
     def explain(self):
         self.print_header()
         if self.conflicts:
-            for rel in self.conflicts:
-                [rel1, rel2] = rel
-                print(rel1.print_summary(),"is not close to",rel2.print_summary())
+            for (premise1, premise2) in self.conflicts:
+                # [rel1, rel2] = rel
+                print(premise1.print_summary(),"is not close to",premise2.print_summary())
         else: 
-            print("REASONABLE TO DO")# Print summary if reasonable     
+            print("REASONABLE TO DO")# Print summary if reasonable
+
+    def add_support(self, context):
+        # if their types are not the same, then the context will not change the unreasonable statement
+        # TODO how to figure context type?
+        for (premise1, premise2) in self.conflicts:
+            assert(premise1.relation == premise2.relation)
+            conflict_relationship = premise1.relation
+            # if context.get_type() == conflict_relationship:
+                # check if there is a path of that relation type from subject to context
+            subject_context_edge = has_edge(self.subject, context, conflict_relationship)
+            object_context_edge = has_edge(self.object, context, conflict_relationship)
+            reasonable = subject_context_edge and object_context_edge
+
+            # return unreasonable immediately if false
+            if not reasonable:
+                return reasonable
+        return reasonable   
 
 # Explains whether the triple is reasonable or not
 def explain(triple):

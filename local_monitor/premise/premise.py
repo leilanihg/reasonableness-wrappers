@@ -5,9 +5,10 @@ class Premise:
     def __init__(self, concept, relation, result):
         self.concept = concept
         self.relation = getRelationEnum(relation)
+        # TODO what is result?
         self.result = result
         # self.reason = 'physcis, ....
-
+    
     def print_summary(self):
         builder = ''
         builder.join(self.concept).join(' ')

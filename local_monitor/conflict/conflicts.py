@@ -8,6 +8,17 @@ from ..conceptnet.search import *
 #                 print(rel_1, "not close to ", rel_2)
 
 # Only returns one conflict as of now
+class Conflict():
+
+    def __init__(premise1, premise2, relation):
+        self.premise1 = premise1
+        self.premise2 = premise2
+        self.relation = relation
+
+    def relation():
+        return self.relation
+
+# returns list of Conflict objects
 def relation_conflict(rel):
     conflicts = []
     for key,premises in rel.items():
