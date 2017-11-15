@@ -11,7 +11,6 @@ from premise import *
 
 limit = 3
 query_prefix = 'http://api.conceptnet.io/c/en/'
-debug
 
 class LocalMonitor:
     """A simple monitor class that stores premises, and checks for 
@@ -34,11 +33,11 @@ class LocalMonitor:
         self.addPremises(self.verb_anchor.premises)
         self.addPremises(self.object_anchor.getPremises())
 
-        print(debug)
-        if debug:
-            print("DEBUG MODE")
-        logging.debug('Printing Anchor Points')
-        logging.debug('')
+#        print(debug)
+#        if debug:
+#            print("DEBUG MODE")
+#        logging.debug('Printing Anchor Points')
+#        logging.debug('')
 
     def addPremises(self, new_premises):
         for premise in new_premises:
