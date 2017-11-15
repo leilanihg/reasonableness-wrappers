@@ -1,7 +1,13 @@
+import requests
+
+query_prefix = 'http://api.conceptnet.io/c/en/'
+
 # Used to printint to sderr
 def eprint(*args, **kwargs):
     print(*args, file=sys.stderr, **kwargs)
 
+# TODO change from finding IsA path to any relation path
+# Check with how this can work with ConceptNet
 def find_IsA_path(start, end, path=None, queue=None, seen=None):
     if path is None:
         path = []
@@ -80,3 +86,66 @@ def clean_search(input):
     elif(cleaned.startswith("an ")):
         cleaned = cleaned.replace("an ", "", 1)           
     return cleaned.replace(" ", "_").lower()
+
+# Checks if there is any correlation (just an edge)
+def has_any_edge(word, concept):
+    word_text = word.replace(" ", "_").lower()
+    obj = requests.get('http://api.conceptnet.io/query?node=/c/en/'+word_text+\
+                           '&other=/c/en/'+concept).json()
+    edges = obj['edges']
+    if(edges):
+        return True
+    else: return False
+
+# First check if there is a direct connection via an IsA relation
+def has_IsA_edge(word, concept):
+    word_text = word.replace(" ", "_").lower()
+
+    obj = requests.get(query_prefix+word_text+'?rel=/r/IsA&limit=1000').json()
+    edges = obj['edges']
+    for edge in edges:
+        start = edge['start']['label'].lower()
+        end = edge['end']['label'].lower()
+
+        if(search_equals(word, start) and isA_equals(concept, end.lower())):# == concept.lower()):
+            return True
+    return False
+
+def has_edge(word, concept, relation):
+    word_text = word.replace(" ", "_").lower()
+
+    obj = requests.get(query_prefix+word_text+'?rel=/r/' + relation + '&limit=1000').json()
+    edges = obj['edges']
+    for edge in edges:
+        start = edge['start']['label'].lower()
+        end = edge['end']['label'].lower()
+
+        if(search_equals(word, start) and isA_equals(concept, end.lower())):# == concept.lower()):
+            return True
+    return False
+
+# Phrases don't always count
+def isA_equals(concept, phrase):
+    if concept in phrase:
+        return True
+    else: return False
+
+def containsConcept(concept, list):
+    for item in list:
+        if concept in item[0]:
+            return item[0]
+    return False
+
+# TODO - something strange about the query request
+# So hard-coded in a check for the relation
+def search_relation(word, relation):
+    concepts = []
+    word_text = word.replace(" ", "_").lower()
+    obj = requests.get(query_prefix+word_text+'?rel=/r/'+relation+
+                       '&limit=1000').json()
+    edges = obj['edges']
+    for edge in edges:
+        if edge['rel']['label'] == relation:
+            end = edge['end']['label'].lower()
+            concepts.append(end)
+    return concepts

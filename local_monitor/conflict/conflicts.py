@@ -1,5 +1,5 @@
-from explain import *
-from local_monitor import *
+from ..conceptnet.explain import *
+from ..conceptnet.search import *
 
 # def relation_conflict(relations):
 #     for rel_1 in relations:

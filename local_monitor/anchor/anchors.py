@@ -1,7 +1,7 @@
 # Python class symbolic objects and things
 from sympy import *
-from local_monitor import *
-from premise import *
+from ..premise.premise import *
+from ..verbs.verbs import *
 
 def make_anchor_point(name):
       binding = find_anchor_point(name)
@@ -17,6 +17,18 @@ def make_anchor_point(name):
             return place(name)
       else: return confusion(name)
 
+# Finds the specific anchor point or type of a specific word
+def find_anchor_point(word):
+    concepts = ['animal', 'object', 'place', 'plant']
+    for concept in concepts:
+        #relation = isA(word, concept)
+        if(has_IsA_edge(word, concept)):
+            return concept
+    for concept in concepts:    
+        if(find_IsA_path(word, concept)):
+            return concept
+    return 'confusion'
+
 class verb:
       def __init__(self, subject, name):
             self.name = name
@@ -28,8 +40,9 @@ class verb:
             # This may need some special case
             #self.premises.append(Premise(self.subject, self.type, True))
             return
+# TODO make anchorpoint interface with all of the definitions it should have
+# Move all of these to separate files
 
-# This 
 class person:
       def __init__(self, name, habitat=[], eats=[]):
             self.name = name

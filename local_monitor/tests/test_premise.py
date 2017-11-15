@@ -1,6 +1,6 @@
 import unittest
 import warnings
-from premise import *
+from ..premise.premise import *
  
 #from util.normalization import remove_repeating_chars
  

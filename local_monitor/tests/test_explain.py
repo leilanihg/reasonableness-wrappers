@@ -1,5 +1,5 @@
 import unittest
-from explain import *
+from ..conceptnet.explain import *
 
 #class SimpleWidgetTestCase(unittest.TestCase):
 #    def setUp(self):

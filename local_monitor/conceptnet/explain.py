@@ -2,7 +2,7 @@ import requests
 from nltk.corpus import stopwords
 from nltk import pos_tag, word_tokenize
 from sympy import *
-from anchors import * 
+from ..anchor.anchors import * 
 #from conceptnet5.db.query import AssertionFinder
 
 def search_between(start, end, path=[]):
@@ -76,11 +76,11 @@ def isConfusion(word):
         isA(word, 'weather')
     return 
 
-# Finds the specific anchor point or type of a specific word
-def find_anchor_point(word):
-    concepts = ['animal', 'plant', 'object', 'place']
-    for concept in concepts:
-        relation = isA(word, concept)
+# # Finds the specific anchor point or type of a specific word
+# def find_anchor_point(word):
+#     concepts = ['animal', 'plant', 'object', 'place']
+#     for concept in concepts:
+#         relation = isA(word, concept)
 
 def find_hierarchy_path(start, end, count=0, path=[]):
     limit = 5 # May want to be global
