@@ -1,4 +1,16 @@
 import unittest
+from .test_anchors import *
+from .test_explain import *
+from .test_premise import *
+from .test_search import *
+from .test_verbs import *
+
+def ignore_warnings(test_func):
+    def do_test(self, *args, **kwargs):
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore")
+            test_func(self, *args, **kwargs)
+    return do_test
 
 class TestStringMethods(unittest.TestCase):
 
