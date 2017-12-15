@@ -1,0 +1,8 @@
+% TODO - this should be added to all the branches
+To run 
+>> python3 -m local_monitor.local_monitor penguin eats food
+
+To run tests 
+>> call python3 -m local_monitor.tests.test
+
+TODO - Need to find a way to run individual tests
