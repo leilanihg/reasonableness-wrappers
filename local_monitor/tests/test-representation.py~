@@ -1,0 +1,22 @@
+import unittest
+from ..primitives.representation import *
+
+
+# A set of tests
+class TestVerbPrimitive(unittest.TestCase):
+    def runTest(self):
+        tester = """                                                                                       |
+  S -> NP VP                                                                                         |
+  VP -> V NP | V NP PP                                                                               |
+  PP -> P NP""" 
+        self.assertEqual(make_string_grammar([]), tester)
+
+class TestStringBuilder(unittest.TestCase):
+    def runTest(self):
+        self.assertEqual(stringBuilder(['']), '')
+        self.assertEqual(stringBuilder(['harry', 'met', 'sally']), 'harry met sally')
+        self.assertEqual(stringBuilder(['when we', 'were', 'young']),
+                         'when we were young')
+
+if __name__ == '__main__':
+    unittest.main()

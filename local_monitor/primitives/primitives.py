@@ -1,3 +1,4 @@
+from search import *
 
 # Super class
 # PP  - (picture producer) A physical object
@@ -10,15 +11,78 @@
 # PA  - attributes of an object, of the form STATE(VALUE)
 #     - e.g. COLOR(red)
 class ACT:
-    def __init__(self, subject, object):
+    def __init__(self, subject, verb, object, context=None, phrases=None, verbose=False):
         self.subject = subject
+        self.verb = verb
         self.object = object
-
-        self.pp = None #
-        # Maybe something about another connection here
+        #self.subject_phrase = subject_phrase
+        self.context = context
+        self.phrases = phrases
+        self.support = []
+        if 'pp' in phrases:
+            self.pp = phrases['pp']
+        self.violations = []
+        self.props = [] # Propositions that NEED to be printed
+        self.verbose = verbose # default is fault
     def constaints_violated(self):
         if violated:
             return self.constraints
+
+    # Added for the new primitives
+    def can_move(self, subject):
+        if has_IsA_edge(subject, 'animal', self.verbose): 
+            self.support.append("A(n) %s is an animal and animals can move on their own." % subject)
+            return True
+        elif has_IsA_edge(subject, 'person', self.verbose):#and not has_IsA_edge(subject, 'plant', self.verbose)
+            self.support.append("A(n) %s is a person that can walk on their own." % subject)
+            return True
+        elif subject.istitle():
+            self.support.append("Capitalized names are assumed to belong to people.")
+            self.support.append("So, %s is a person that can walk on their own." % subject)
+            return True
+        else: return False
+
+    # Assume this is a list for now
+    def can_propel(self, contexts):
+        for context in contexts:
+            if self.verbose:
+                print("Anchor point query: Searching if", context, "is a", \
+                          "confusion anchor point")
+            if isConfusion(context):
+                if self.verbose:
+                    print("  Confusion quality found for", context)
+                str = "Although a  %s cannot move on its own, a %s can propel a stationary object to move." % (self.subject, context)
+                self.support.append(str)
+                self.props.append("in a %s" %context)
+                return True
+            return False
+
+    def print_summary(self):
+        if not self.violations:
+            print("\n")
+            print("This perception is reasonable")
+            print("=============================================")
+            for element in self.support:
+                print(element)
+            print("So it is reasonable for", self.summary())
+        else:
+            print("\n")
+            print("This perception is unreasonable")
+            print("=============================================")
+            for element in self.violations:
+                print(element)
+            print("So it is unreasonable for", self.summary())
+
+    def summary(self):
+        if 'object' in self.phrases:
+            summary = "%s to %s %s" %\
+                (self.phrases['noun'].lower(), self.verb, self.phrases['object'][0])
+        else:
+            summary = "%s to %s" %(self.phrases['noun'].lower(), self.verb)
+        if self.props:
+            for element in self.props:
+                summary += " %s" %element
+        return summary
 
 # There are five primitives for physical actions
 # INJEST - to take something inside an animate object
@@ -27,24 +91,48 @@ class ACT:
 # MOVE - to move a body part
 # PROPEL - to apply a force to 
 class PhysicalAction(ACT):
+    def constaints_violated(self):
+        if violated:
+            return self.constraints
 
 # 2 state changes for physical and abstract transfers
 # PRTRANS -  To change the location of a physical object
 # ATRANS - To change an abstract relationship of a physical object
 class StateChange(ACT):    
+    def constaints_violated(self):
+        if violated:
+            return self.constraints
 
 # 2 mental acts
 # MTRANS - to transfer information mentally
 # MBUILD - to create or combine thoughts
 class MentalAct(ACT):
+    def constaints_violated(self):
+        if violated:
+            return self.constraints
 
 # Instrument for other ACT
 # To produce a sound
 class Speak(ACT):
+    def can_speak(self, subject):
+        if has_IsA_edge(subject, 'animal', self.verbose) and not subject == 'plant':
+            self.support.append("A(n) %s is an animal and animals can communicate" % subject)
+        else: return False
+
+    def check_constraints(self):
+        if self.can_speak(self.subject):
+            return True
+        else:
+            violation = "A %s is an object or thing that does not have the ability to produce sounds" %(self.subject)
+            self.violations.append(violation)
+            return False
 
 # Instrument for other ACT
 # To direct a sense organ or focus an organ towards a stimulus
 class Attend(ACT):
+    def constaints_violated(self):
+        if violated:
+            return self.constraints
 
 # A person object or thing changes physical position or localion
 class PTrans(StateChange):
@@ -67,15 +155,16 @@ class ATrans(StateChange):
 # A person object or thing moves a part of its body or part
 # of itself    
 class Move(PhysicalAction):
-    def constraints(self):
-        return None
-
-    
-
-    def summary(self):
-        self.summary= ''.join([self.subject, " moves ", self.object])
-        return self.summary
-        #print(self.subject, "moves", self.object)
+    # Add support here
+    def check_constraints(self):
+        if self.can_move(self.subject):
+            return True
+        elif self.can_propel(self.context):
+            return True
+        else:
+            violation = "A %s is an object or thing that cannot move on its own." %(self.subject)
+            self.violations.append(violation)
+            return False
 
 # A person, object or thing grabs hold of another person,
 # object or thing, or becomes attatched to another person
@@ -135,3 +224,15 @@ def stringBuilder(str_list=None):
         str += ' '
         space_list.append(str)
     return ''.join(space_list).strip()
+
+# A force that can move things
+def isConfusion(item):
+    confusions = ['hurricane', 'storm', 'earthquake']
+    if item in confusions:
+        return True
+    else: return False
+
+# Some examples that work
+# A classy plant crossed the street
+
+# TODO need to fix the object problem
