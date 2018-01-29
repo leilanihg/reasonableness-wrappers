@@ -1,0 +1,8 @@
+Run from the primitives directory:
+python3 representation.py A mailbox crossing the street
+
+python3 representation.py A mailman crossing the street
+
+For verbose option:
+python3 representation.py -v A mailbox crossing the street
+python3 representation.py -v A mailman crossing the street
