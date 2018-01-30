@@ -1,0 +1,132 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="static/css/bootstrap.min.css">
+
+    <link rel="stylesheet" href="static/css/font-awesome.min.css">
+
+
+    <title>Hello, world!</title>
+  </head>
+  <body>
+
+    <div class="container">
+        <h1>Reasonableness of Image Captions</h1>
+
+        <div class="row mb-3">
+            <div class="col-md-12">
+                <div class="media">
+                    <div id="image_container" class="mr-3 border" style="width:200px;height:200px">Some image...</div>
+                    <div class="media-body">
+                        <div class="row">
+                            <div class="col-md-3">
+                                <button class="form-control" id="generate_button">Generate Caption</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+        <div class="row mb-3">
+            <div class="col-md-12">
+                <input id="caption_container" class="form-control" placeholder="Some caption..." />
+            </div>
+        </div>
+
+        <div class="row mb-3">
+            <div class="col-md-4 offset-md-4">
+                <button class="form-control" id="evaluate_button">Reasonable?</button>
+            </div>
+            <div class="col-md-4">
+                <span id="loading_badge" class="fa fa-fw fa-2x fa-cog fa-spin"></span>
+                <span id="reasonable_badge" class="fa fa-fw fa-2x fa-check"></span>
+                <span id="unreasonable_badge" class="fa fa-fw fa-2x fa-times"></span>
+            </div>
+        </div>
+
+        <div class="row mb-3">
+            <div class="col-md-12">
+                <textarea class="form-control" id="log" rows="10">
+                </textarea>
+            </div>
+        </div>
+
+    </div>
+
+    <script src="static/js/jquery-3.3.1.min.js"></script>
+    <script src="static/js/bootstrap.bundle.min.js"></script>
+    <script src="static/js/lodash.min.js"></script>
+
+    <script type="text/javascript">
+
+    $('#loading_badge').hide();
+    $('#reasonable_badge').hide();
+    $('#unreasonable_badge').hide();
+
+    $('#generate_button').click(function(e){
+      e.preventDefault();
+      $('#caption_container').val('a mailbox crossing the street');
+    })
+
+    $('#evaluate_button').click(function(e){
+      e.preventDefault();
+
+      $('#reasonable_badge').hide();
+      $('#unreasonable_badge').hide();
+      $('#loading_badge').show();
+
+      $.post({
+        url: '/api/1/evaluate',
+        data: JSON.stringify({
+          caption: $('#caption_container').val()
+        }),
+        contentType: 'application/json',
+        success: function(data, textStatus, jqXHR){
+          $('#loading_badge').hide();
+          if(data.reasonable)
+          {
+            $('#reasonable_badge').show();
+
+            let t = "This perception is REASONABLE\n=======================\n";
+            _.forEach(data.support, function(s){
+              t += s + "\n";
+            })
+
+            t += "So it is reasonable for " + data.caption_summary;
+
+            $('#log').val(t);
+          }
+          else
+          {
+            $('#unreasonable_badge').show();
+
+            let t = "This perception is UNREASONABLE\n=======================\n";
+            _.forEach(data.violations, function(s){
+              t += s + "\n";
+            })
+
+            t += "So it is unreasonable for " + data.caption_summary;
+
+            $('#log').val(t);
+          }
+        },
+        error: function(jqxhr, textStatus, errorThrown){
+          $('#loading_badge').hide();
+
+          let t = `Error trying to evaluate: ${textStatus}\n\n${errorThrown}`;
+          $('#log').val(t);
+        },
+      })
+    })
+
+    </script>
+
+  </body>
+</html>

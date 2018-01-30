@@ -1,5 +1,5 @@
-from search import *
-from primitives import *
+from .search import *
+from .primitives import *
 
 # Moving - is there an edge between action and move
 # Linking - perhaps an exact check
@@ -7,7 +7,7 @@ from primitives import *
 # Possession - perhaps an exact check
 # Communication - connection to talk/speak or listen/hear
 def find_verb_type(verb):
-    types = ['action', 'linking', 'helping', 'passive', 'possession', 
+    types = ['action', 'linking', 'helping', 'passive', 'possession',
              'communication']
     action_verbs = ['move', 'action']
     if(is_linking_verb(verb)):
@@ -57,7 +57,7 @@ def is_linking_verb(verb):
 # No actions
 def is_helping_verb(verb):
     toBe = ['is', 'am', 'are','was' 'were', 'be', 'being', 'been']
-    conditionals = ['could', 'should', 'would', 'can', 'shall', 'will', 
+    conditionals = ['could', 'should', 'would', 'can', 'shall', 'will',
                     'may', 'might', 'must']
     toHave = ['have', 'has', 'had']
     toDo = ['do', 'does', 'did']
@@ -79,7 +79,7 @@ def is_possession_verb(verb):
     toPay = ['pay', 'pays', 'paid', 'paying']
     toBuy = ['buy', 'buys', 'bought', 'buying']
     toSend = ['send', 'sends', 'sent', 'sending']
-    
+
     toBelong = ['belong', 'belongs', 'belonged', 'belonging']
     toPossess = ['possess', 'possesses', 'possessed', 'possessing']
     toHold = ['hold', 'holds', 'held', 'holding']
@@ -91,11 +91,11 @@ def is_possession_verb(verb):
         return True
     else: return False
 
-# TODO - scream yell, argue 
+# TODO - scream yell, argue
 def is_communication_verb(word,verbose):
     toTalk = ['talk', 'talks', 'talked', 'talking']
     verb = word #WordNetLemmatizer().lemmatize(word,'v')
-    return has_any_edge(verb, 'communicate', verbose)   
+    return has_any_edge(verb, 'communicate', verbose)
 
 # Just added
 def get_verb_type(base, subject, object, context, phrases, verbose=False):
@@ -107,4 +107,5 @@ def get_verb_type(base, subject, object, context, phrases, verbose=False):
         if verbose:
             print("MOVE verb primitive created.")
         return Move(subject, base, object, context, phrases, verbose)
-    
+    else:
+        raise ValueError("don't know how to handle verb {0}".format(base))
