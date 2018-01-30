@@ -1,4 +1,4 @@
-from search import *
+from .search import *
 
 # Super class
 # PP  - (picture producer) A physical object
@@ -30,7 +30,7 @@ class ACT:
 
     # Added for the new primitives
     def can_move(self, subject):
-        if has_IsA_edge(subject, 'animal', self.verbose): 
+        if has_IsA_edge(subject, 'animal', self.verbose):
             self.support.append("A(n) %s is an animal and animals can move on their own." % subject)
             return True
         elif has_IsA_edge(subject, 'person', self.verbose):#and not has_IsA_edge(subject, 'plant', self.verbose)
@@ -73,6 +73,14 @@ class ACT:
                 print(element)
             print("So it is unreasonable for", self.summary())
 
+    def summary_info(self):
+        return {
+            'reasonable': len(self.violations) == 0,
+            'caption_summary': self.summary(),
+            'support': self.support,
+            'violations': self.violations
+        }
+
     def summary(self):
         if 'object' in self.phrases:
             summary = "%s to %s %s" %\
@@ -89,7 +97,7 @@ class ACT:
 # EXPEL - to take something from inside an animate object and force it out
 # GRASP - to physically grasp an object
 # MOVE - to move a body part
-# PROPEL - to apply a force to 
+# PROPEL - to apply a force to
 class PhysicalAction(ACT):
     def constaints_violated(self):
         if violated:
@@ -98,7 +106,7 @@ class PhysicalAction(ACT):
 # 2 state changes for physical and abstract transfers
 # PRTRANS -  To change the location of a physical object
 # ATRANS - To change an abstract relationship of a physical object
-class StateChange(ACT):    
+class StateChange(ACT):
     def constaints_violated(self):
         if violated:
             return self.constraints
@@ -153,7 +161,7 @@ class ATrans(StateChange):
         print(self.subject, "changes physical position or location")
 
 # A person object or thing moves a part of its body or part
-# of itself    
+# of itself
 class Move(PhysicalAction):
     # Add support here
     def check_constraints(self):
@@ -181,7 +189,7 @@ class Grasp(PhysicalAction):
             print(self.subject, "grabs", self.object)
         else:
             print(self.subject, "becomes attatched to ", self.object)
-            
+
 # A person, object or thing applies a force to another person,
 # object or thing, or a moving person, object or thing
 # strikes or impacts another person object or thing
@@ -194,7 +202,7 @@ class Propel(PhysicalAction):
             print(self.subject, "applies a force to", self.object)
         else: # the other case may be
             print(self.subject, "strikes or impacts ", self.object)
-        
+
 
 # A person, object or thing is taken from or comes from inside
 # another person,  object, or thing and is forced out
@@ -216,7 +224,7 @@ class Injest(PhysicalAction):
             print(self.object, "forces itself to go inside of ", self.subject)
         else:
             print(self.object, "is forced to go inside of ", self.subject)
-    
+
 # Made a string builder for python
 def stringBuilder(str_list=None):
     space_list = []

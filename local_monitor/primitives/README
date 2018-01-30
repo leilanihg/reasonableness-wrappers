@@ -1,8 +1,15 @@
-Run from the primitives directory:
-python3 representation.py A mailbox crossing the street
+Web
+===
+Run run.sh and go to http://localhost:5000 from a Web browser on the same
+machine.
 
-python3 representation.py A mailman crossing the street
 
-For verbose option:
-python3 representation.py -v A mailbox crossing the street
-python3 representation.py -v A mailman crossing the street
+Command-line
+============
+Run from the PARENT directory:
+python3 -m primitives.representation a mailbox crossing the street
+python3 -m primitives.representation a mailman crossing the street
+
+For verbose output:
+python3 -m primitives.representation -v a mailbox crossing the street
+python3 -m primitives.representation -v a mailman crossing the street

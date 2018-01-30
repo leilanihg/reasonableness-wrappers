@@ -4,14 +4,14 @@ import sys
 import itertools
 import logging as log # Suggestion from stackoverflow
 import operator
-from primitives import *
+from .primitives import *
 import nltk
 from nltk.tokenize import sent_tokenize, word_tokenize
 from collections import defaultdict
 from nltk.stem.wordnet import WordNetLemmatizer
 #from conceptnet.search import *
-from search import *
-from verbs import *
+from .search import *
+from .verbs import *
 
 def pos(strs):
     sentence = stringBuilder(strs)
@@ -114,14 +114,14 @@ def simple_parse_without(words):
     print(tags)
 
     from_string ="""
-S -> NP VP 
+S -> NP VP
 NP -> DT NP PP | PRP | Nom | Adj NP | Nom CC Nom
 VP -> V | V VP | V Adj | Adv V | VP PP | VP S | VP NP PP | VP NP
 V -> VB | VBZ | VBP | VBD | VBG | VBN
 Nom -> DT Nom | Adj Nom | NN | NNP | PRP
 Adj -> JJ | JJR | JJS
 Adv -> RB | RBR | RBS
-PP -> P NP 
+PP -> P NP
 P -> PP | IN | TO"""
     for (word, tag) in tags:
         from_string += "\n"
@@ -141,7 +141,7 @@ P -> PP | IN | TO"""
 def parse_with_regex(words):
     tags = nltk.pos_tag(words)#check_tags(nltk.pos_tag(words))
     log.debug(tags)
-    #grammar = "NP: {<DT>?<JJ>*<NN>}" 
+    #grammar = "NP: {<DT>?<JJ>*<NN>}"
     parser = nltk.RegexpParser('''
     NP: {<DT|PRP$>? <JJ>* <NN|NNP|PRP>*} # NP
     P: {<IN|TO>}           # Preposition
@@ -171,12 +171,12 @@ def get_noun_phrase(tree):
         for (name, label) in subtree:
             if label.startswith('N') or label.startswith('PRP'):
                 noun = name
-            phrase += name 
+            phrase += name
             phrase += ' '
         # Assume it's the first noun
         return (noun, phrase.strip())
 
-# 
+#
 def get_verbs(tree):
     phrases = {}
     context = []
@@ -259,12 +259,12 @@ def test_again(tokens):
                 print("| \"" + word + "\"")
         print('')
 
-# TODO - Need verbose 
+# TODO - Need verbose
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('sentence', nargs='+',
                     help='Sentence')
-    parser.add_argument("-d", "--debug", action='store_true', 
+    parser.add_argument("-d", "--debug", action='store_true',
                         help='print debug messages to stderr')
     parser.add_argument("-v", "--verbose", action='store_true',
                         help='This is the same as debug right now')
