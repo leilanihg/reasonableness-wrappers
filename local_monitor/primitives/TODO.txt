@@ -5,3 +5,7 @@
 3.  Where to put in the car expectations? 
     a) How to organize?
 4.  Script for running it (instead of the weird python syntax).
+
+TEST CASES
+---------
+* Communicate words not working (talks, etc.)
