@@ -151,6 +151,7 @@ def parse_with_regex(words):
     VP: {<V V*> <NP|PP>*}  # VP -> V (NP|PP)*
     ''')
     result = parser.parse(tags)
+    result.draw()
     #log.debug(result.draw())
     return result
 

@@ -9,3 +9,4 @@
 TEST CASES
 ---------
 * Communicate words not working (talks, etc.)
+* Add 'types' of movement - a penguin flying across the sky

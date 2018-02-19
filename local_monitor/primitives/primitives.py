@@ -29,20 +29,20 @@ class ACT:
             return self.constraints
 
     # Added for the new primitives
-    def is_animate(self, subject):
+    def is_animate(self, subject, action='move'):
         if has_IsA_edge(subject, 'animal', self.verbose):
-            self.support.append("A(n) %s is an animal and animals can move on their own." % subject)
+            self.support.append("A(n) %s is an animal and animals can %s on their own." % (subject, action))
             return True
         elif has_IsA_edge(subject, 'person', self.verbose):#and not has_IsA_edge(subject, 'plant', self.verbose)
-            self.support.append("A(n) %s is a person that can walk on their own." % subject)
+            self.support.append("A(n) %s is a person that can %s on their own." % (subject, action))
             return True
         elif subject.istitle():
             self.support.append("Capitalized names are assumed to belong to people.")
-            self.support.append("So, %s is a person that can walk on their own." % subject)
+            self.support.append("So, %s is a person that can %s on their own." % (subject, action))
             return True
         else: return False
 
-    # Many anchor points require that the object must be a physical object, thingm substance
+    # Many anchor points require that the object must be a physical object, thing substance
     # or person.
     def is_phys_obj(self, object):
         if has_IsA_edge(object, 'object', self.verbose):
@@ -181,6 +181,8 @@ class ATrans(StateChange):
 # A person object or thing moves a part of its body or part
 # of itself
 class Move(PhysicalAction):
+    # Add types of movement here?
+
     # Add support here
     def check_constraints(self):
         if self.is_animate(self.subject):
@@ -215,11 +217,10 @@ class Grasp(PhysicalAction):
 #    - The object must be a physical object, thing, substance or person
 #    - The actor must be an "animate" object or thing capabale of applying
 #      a force or momentum to another object
-
 class Propel(PhysicalAction):
     # Add support here
     def check_constraints(self):
-        if self.is_animate(self.subject) and self.is_phys_object(self.object):
+        if self.is_animate(self.subject, "apply a force") and self.is_phys_obj(self.object):
             return True
         elif self.can_propel(self.context):
             return True
@@ -227,14 +228,15 @@ class Propel(PhysicalAction):
             violation = "A %s is an object or thing that cannot move on its own." %(self.subject)
             self.violations.append(violation)
             return False
-    def constraints(self):
-        return None
 
-    def summary(self):
-        if self.force:
-            print(self.subject, "applies a force to", self.object)
-        else: # the other case may be
-            print(self.subject, "strikes or impacts ", self.object)
+    # Why didn't the original work?
+    #def summary(self):
+    #    return "%s to apply a force to the %s" %(self.subject, self.object)
+    #"applies a force to", self.object)
+        #if self.force:
+        #    print(self.subject, "applies a force to", self.object)
+        #else: # the other case may be
+        #    print(self.subject, "strikes or impacts ", self.object)
 
 
 # A person, object or thing is taken from or comes from inside
@@ -277,3 +279,4 @@ def isConfusion(item):
 # A classy plant crossed the street
 
 # TODO need to fix the object problem
+# A penguin flying across the sky - is reasonable, should be unreasonable

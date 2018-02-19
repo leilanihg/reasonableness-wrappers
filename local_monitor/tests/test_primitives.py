@@ -14,5 +14,9 @@ class TestStringBuilder(unittest.TestCase):
         self.assertEqual(stringBuilder(['when we', 'were', 'young']),
                          'when we were young')
 
+class TestExpectedPrimitive(unittest.TestCase):
+    def runTest(self):
+        
+
 if __name__ == '__main__':
     unittest.main()

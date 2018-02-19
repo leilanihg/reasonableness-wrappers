@@ -92,17 +92,24 @@ def is_possession_verb(verb):
     else: return False
 
 # TODO - scream yell, argue
-def is_communication_verb(word,verbose):
-    toTalk = ['talk', 'talks', 'talked', 'talking']
-    verb = word #WordNetLemmatizer().lemmatize(word,'v')
+def is_communication_verb(verb,verbose):
     return has_any_edge(verb, 'communicate', verbose)
 
+# kick hit
+def is_propel_verb(verb, verbose):
+    return has_any_edge(verb, 'hit', verbose)
+
 # Just added
+# TODO - add IsA and \HasA
 def get_verb_type(base, subject, object, context, phrases, verbose=False):
     if is_communication_verb(base, verbose):
         if verbose:
             print("SPEAK verb primitive created.")
         return Speak(subject, base, object, context, phrases, verbose)
+    elif is_propel_verb(base, verbose):
+        if verbose:
+            print("PROPEL verb primitive created.")
+        return Propel(subject, base, object, context, phrases, verbose)
     elif is_action_verb(base, verbose):
         if verbose:
             print("MOVE verb primitive created.")
