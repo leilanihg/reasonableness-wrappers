@@ -88,22 +88,23 @@ def clean_search(input):
     return cleaned.replace(" ", "_").lower()
 
 # Checks if there is any correlation (just an edge)
-def has_any_edge(word, concept, verbose=False):
+# Only to be used for verb primitives, otherwise not strong enough correlation
+def has_any_edge(word, verb_primitive, verbose=False):
     word_text = word.replace(" ", "_").lower()
     if verbose:
-        print("ConceptNet Query: Searching for an edg between", word, \
-                  "and the anchor point", concept)
+        print("ConceptNet Query: Searching for an edge between", word, \
+                  "and the verb primitive", verb_primitive)
     obj = requests.get('http://api.conceptnet.io/query?node=/c/en/'+word_text+\
-                           '&other=/c/en/'+concept).json()
+                           '&other=/c/en/'+verb_primitive).json()
     edges = obj['edges']
     if(edges):
         if verbose:
-            print("  Edge found between", word, "and the anchor point", concept)
+            print("  Edge found between", word, "and the verb primitive", verb_primitive)
         return True
     else:
         if verbose:
-            print("  No edge found between", word, "and the anchor point", concept)
-            print("  Going to search for the next anchor point")
+            print("  No edge found between", word, "and the verb primitive", verb_primitive)
+            print("  Going to search for the next the verb primitive")
         return False
 
 # First check if there is a direct connection via an IsA relation

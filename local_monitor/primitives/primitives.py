@@ -109,7 +109,7 @@ class ACT:
         return summary
 
 # There are five primitives for physical actions
-# INJEST - to take something inside an animate object
+# INGEST - to take something inside an animate object
 # EXPEL - to take something from inside an animate object and force it out
 # GRASP - to physically grasp an object
 # MOVE - to move a body part
@@ -255,15 +255,24 @@ class Expel(PhysicalAction):
 
 # A person, object, or thing is forced (or forces itself) to go
 # inside of another person object or thing
-class Injest(PhysicalAction):
+class Ingest(PhysicalAction):
+    def check_constraints(self):
+        if self.is_animate(self.subject):
+            return True
+        else:
+            violation = "A %s is an object or thing that cannot ingest." %(self.subject)
+            self.violations.append(violation)
+            return False
+
     def constraints(self):
         return None
 
-    def summary(self):
-        if forces_itself:
-            print(self.object, "forces itself to go inside of ", self.subject)
-        else:
-            print(self.object, "is forced to go inside of ", self.subject)
+    # def summary(self):
+    #     return self.subject + ' to ' + self.verb + ''
+        # if forces_itself:
+        #     print(self.object, "forces itself to go inside of ", self.subject)
+        # else:
+        #     print(self.object, "is forced to go inside of ", self.subject)
 
 # Made a string builder for python
 def stringBuilder(str_list=None):

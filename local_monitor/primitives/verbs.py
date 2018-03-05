@@ -99,9 +99,20 @@ def is_communication_verb(verb,verbose):
 def is_propel_verb(verb, verbose):
     return has_any_edge(verb, 'hit', verbose)
 
+def is_ingest_verb(verb, verbose):
+    if has_any_edge(verb, 'eat', verbose) or has_any_edge(verb, 'ingest', verbose):
+        return True
+    return False 
+
+# Use not any edge, and instead count the hops so that we can use the closest verb
 # Just added
 # TODO - add IsA and \HasA
 def get_verb_type(base, subject, object, context, phrases, verbose=False):
+    if is_ingest_verb(base, verbose):
+        if verbose:
+            print("INGEST verb primitive created.")
+        return Ingest(subject, base, object, context, phrases, verbose)
+
     if is_communication_verb(base, verbose):
         if verbose:
             print("SPEAK verb primitive created.")
