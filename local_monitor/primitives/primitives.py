@@ -23,14 +23,17 @@ class ACT:
             self.pp = phrases['pp']
         self.violations = []
         self.props = [] # Propositions that NEED to be printed
-        self.verbose = verbose # default is fault
+        self.verbose = verbose # default is false
     def constaints_violated(self):
         if violated:
             return self.constraints
 
     # Added for the new primitives
     def is_animate(self, subject, action='move'):
-        if has_IsA_edge(subject, 'animal', self.verbose):
+        if has_IsA_edge(subject, 'vehicle', self.verbose):
+            self.support.append("A(n) %s is a vehicle that can %s on their own." % (subject, action))
+            return True
+        elif has_IsA_edge(subject, 'animal', self.verbose):
             self.support.append("A(n) %s is an animal and animals can %s on their own." % (subject, action))
             return True
         elif has_IsA_edge(subject, 'person', self.verbose):#and not has_IsA_edge(subject, 'plant', self.verbose)
@@ -48,9 +51,11 @@ class ACT:
         if has_IsA_edge(object, 'object', self.verbose):
             self.support.append("A(n) %s is a physical object, thing or substance." % object)
             return True
-        elif has_IsA_edge(subject, 'person', self.verbose):
+        elif has_IsA_edge(subject, 'person', self.verbose): #TODO where is the subject here?
             self.support.append("A(n) %s is a person." % object)
             return True
+        elif has_IsA_edge(object, 'vehicle', self.verbose):
+            self.support.append("A(n) %s is a vehicle." % object)
         else: return False
 
     # Assume this is a list for now

@@ -16,6 +16,11 @@ class Object:
         self.name = name
         self.location = location
 
+class Vehicle:
+    def __init__(self, name, method):
+        self.name = name
+        self.method = method # TODO come up with better word, but basically air, ground, water?
+
 class Furniture(Object):
     def __init__(self, name, location):
         Object.__init__(name, location)
@@ -26,6 +31,10 @@ class Confusion():
         self.condition = condition
 
 class Weather(Confusion):
+    def __init__(self, name, condition):
+        Confusion.__init__(name, condition)
+
+class Storm(Weather):
     def __init__(self, name, condition):
         Confusion.__init__(name, condition)
 

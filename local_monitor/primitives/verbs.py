@@ -53,7 +53,7 @@ def is_linking_verb(verb):
     else: return False
 
 # progressive and perfect aspects
-# Performing specific takss
+# Performing specific taks
 # No actions
 def is_helping_verb(verb):
     toBe = ['is', 'am', 'are','was' 'were', 'be', 'being', 'been']

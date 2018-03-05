@@ -91,7 +91,7 @@ def clean_search(input):
 def has_any_edge(word, concept, verbose=False):
     word_text = word.replace(" ", "_").lower()
     if verbose:
-        print("ConceptNet Query: Searching for an edge between", word, \
+        print("ConceptNet Query: Searching for an edg between", word, \
                   "and the anchor point", concept)
     obj = requests.get('http://api.conceptnet.io/query?node=/c/en/'+word_text+\
                            '&other=/c/en/'+concept).json()
@@ -167,6 +167,7 @@ def search_relation(word, relation):
             concepts.append(end)
     return concepts
 
+# TODO fix this to not be hardcoded
 # A force that can move things
 def isConfusion(item):
     confusions = ['hurricane', 'storm', 'earthquake']
@@ -176,7 +177,7 @@ def isConfusion(item):
 
 # Added for the new primitives
 def can_move(subject):
-    if has_IsA_edge(subject, 'animal'): 
+    if has_IsA_edge(subject, 'vehicle') or has_IsA_edge(subject, 'animal'): 
         return True
     else: return False
 

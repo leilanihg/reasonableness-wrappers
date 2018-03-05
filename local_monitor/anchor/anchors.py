@@ -19,7 +19,7 @@ def make_anchor_point(name):
 
 # Finds the specific anchor point or type of a specific word
 def find_anchor_point(word):
-    concepts = ['animal', 'object', 'place', 'plant']
+    concepts = ['vehicle', 'animal', 'object', 'place', 'plant']
     for concept in concepts:
         #relation = isA(word, concept)
         if(has_IsA_edge(word, concept)):
@@ -119,6 +119,23 @@ class object:
       def exportRelations(self):
             return self.relations
 
+class vehicle:
+       def __init__(self, name, method=None):
+            self.name = name
+            self.method = method
+            self.premises = []
+            self.setInitialPremises()
+      def setInitialPremises(self):
+            self.premises.append(Premise(self.name, 'IsA', 'vehicle'))
+            self.premises.append(Premise(self.name, 'action', True)) # can do certain actions
+      def getPremises(self):
+            return self.premises
+      def writeSummary(self):
+            print(self.name + " is a vehicle that moves in/on " + \
+                        self.method)
+      def exportRelations(self):
+            return self.relations
+
 class place:
       def __init__(self, name, location=[]):
             self.name = name
@@ -149,6 +166,8 @@ class confusion:
                         self.location)
       def exportRelations(self):
             return self.relations
+
+
 
                        
       	  
