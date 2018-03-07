@@ -27,7 +27,7 @@ class ACT:
     def constaints_violated(self):
         if violated:
             return self.constraints
-
+        
     # Added for the new primitives
     def is_animate(self, subject, action='move'):
         if has_IsA_edge(subject, 'vehicle', self.verbose):
@@ -47,13 +47,14 @@ class ACT:
 
     # Many anchor points require that the object must be a physical object, thing substance
     # or person.
+    # TODO A person is not a physical object? 
     def is_phys_obj(self, object):
         if has_IsA_edge(object, 'object', self.verbose):
             self.support.append("A(n) %s is a physical object, thing or substance." % object)
             return True
-        elif has_IsA_edge(subject, 'person', self.verbose): #TODO where is the subject here?
-            self.support.append("A(n) %s is a person." % object)
-            return True
+        # elif has_IsA_edge(subject, 'person', self.verbose): #TODO where is the subject here?
+        #     self.support.append("A(n) %s is a person." % object)
+        #     return True
         elif has_IsA_edge(object, 'vehicle', self.verbose):
             self.support.append("A(n) %s is a vehicle." % object)
         else: return False
@@ -101,6 +102,9 @@ class ACT:
         if 'object' in self.phrases:
             summary = "%s to %s %s" %\
                 (self.phrases['noun'].lower(), self.verb, self.phrases['object'][0])
+            print(self.phrases)
+            print(self.verb)
+            print(self.phrases)
         else:
             summary = "%s to %s" %(self.phrases['noun'].lower(), self.verb)
         if self.props:
@@ -208,6 +212,23 @@ class Grasp(PhysicalAction):
 
     def constraints(self):
         return None
+    
+    # def check_constraints(self):
+    #     return self.check_subject_constraints() and self.check_object_constraints()
+
+    # def check_subject_constraints(self):
+
+    # very naive check
+    # beginning of adding in object constraints
+    def check_object_constraints(self):
+        print("called object constraint")
+        if is_graspable(self.object, self.verbose): 
+            return True
+        else:
+            violation = "A %s is not graspable." %(self.object)
+            self.violations.append(violation)
+            return False
+
 
     def summary(self):
         if self.grabs:
@@ -222,10 +243,14 @@ class Grasp(PhysicalAction):
 #    - The object must be a physical object, thing, substance or person
 #    - The actor must be an "animate" object or thing capabale of applying
 #      a force or momentum to another object
+# TODO why is phys_object necessary for propel? 
 class Propel(PhysicalAction):
-    # Add support here
+    # TODO change name to be check_subject_constraints    
     def check_constraints(self):
-        if self.is_animate(self.subject, "apply a force") and self.is_phys_obj(self.object):
+        return self.check_subject_constraints() and self.check_object_constraints()
+
+    def check_subject_constraints(self):
+        if self.is_animate(self.subject, "apply a force"):
             return True
         elif self.can_propel(self.context):
             return True
@@ -233,6 +258,15 @@ class Propel(PhysicalAction):
             violation = "A %s is an object or thing that cannot move on its own." %(self.subject)
             self.violations.append(violation)
             return False
+
+    def check_object_constraints(self):
+        if is_thing(self.object, self.verbose): 
+            return True
+        else:
+            violation = "A %s cannot be propeled" %(self.object)
+            self.violations.append(violation)
+            return False
+
 
     # Why didn't the original work?
     #def summary(self):
@@ -257,10 +291,24 @@ class Expel(PhysicalAction):
 # inside of another person object or thing
 class Ingest(PhysicalAction):
     def check_constraints(self):
-        if self.is_animate(self.subject):
+        return self.check_subject_constraints() and self.check_object_constraints()
+
+    def check_subject_constraints(self):
+        if self.is_animate(self.subject, action='ingest'):
             return True
         else:
             violation = "A %s is an object or thing that cannot ingest." %(self.subject)
+            self.violations.append(violation)
+            return False
+
+    # very naive check
+    # beginning of adding in object constraints
+    def check_object_constraints(self):
+        print("called object constraint")
+        if is_ingestible(self.object, self.verbose): 
+            return True
+        else:
+            violation = "A %s is not a plant, animal, or liquid and therefore cannot be ingested" %(self.object)
             self.violations.append(violation)
             return False
 
@@ -284,10 +332,29 @@ def stringBuilder(str_list=None):
 
 # A force that can move things
 def isConfusion(item):
+    # TODO Can try to populate this list with ConceptNet
     confusions = ['hurricane', 'storm', 'earthquake']
     if item in confusions:
         return True
     else: return False
+# TODO make a set amount of hops this can search
+# Box is not a plant, but this fails on that
+def is_ingestible(object, verbose=False):
+    # TODO Can try to populate this list with ConceptNet
+    # TODO make conceptnet search to add "an animal, the animal", etc to the search
+    ingestible = ['animal', 'plant', 'liquid']
+    for item in ingestible:
+        if has_IsA_edge(object, item, verbose):
+            return True
+    return False
+    # TODO House has edge with one of these. 
+
+def is_thing(object, verbose=False):
+    graspable = ['object', 'vehicle', 'animal', 'plant']
+    for item in graspable:
+        if has_IsA_edge(object, item, verbose):
+            return True
+    return False
 
 # Some examples that work
 # A classy plant crossed the street
