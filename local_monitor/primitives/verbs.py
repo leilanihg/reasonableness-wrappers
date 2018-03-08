@@ -108,6 +108,7 @@ def is_ingest_verb(verb, verbose):
 # Just added
 # TODO - add IsA and \HasA
 def get_verb_type(base, subject, object, context, phrases, verbose=False):
+    print(base)
     if is_ingest_verb(base, verbose):
         if verbose:
             print("INGEST verb primitive created.")

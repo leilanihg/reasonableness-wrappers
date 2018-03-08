@@ -60,6 +60,9 @@ class ACT:
         else: return False
 
     # Assume this is a list for now
+    # Returns (can_propel, propellor)
+    # can_propel = True if it found an object that can propel
+    # propellor = Object that can propel, None if does not exist
     def can_propel(self, contexts):
         for context in contexts:
             if self.verbose:
@@ -71,8 +74,8 @@ class ACT:
                 str = "Although a  %s cannot move on its own, a %s can propel a stationary object to move." % (self.subject, context)
                 self.support.append(str)
                 self.props.append("in a %s" %context)
-                return True
-            return False
+                return (True, context)
+            return (False, None)
 
     def print_summary(self):
         if not self.violations:
@@ -196,8 +199,20 @@ class Move(PhysicalAction):
     def check_constraints(self):
         if self.is_animate(self.subject):
             return True
-        elif self.can_propel(self.context):
-            return True
+
+        (can_propel, propellor) = self.can_propel(self.context)
+        if can_propel:
+            # make copy of context list and remove propellor
+            contexts = self.context.copy()
+            contexts.remove(propellor)
+
+            # Propel has other constraints, so we need to make a Propel object and check that
+            # Change sentence structure so context is subject, and verb type is propel
+            if self.verbose:
+                print("PROPEL verb primitive created.")
+            newPrimitive = Propel(subject=propellor, verb=self.verb, object=self.object, 
+                context=contexts, phrases=self.phrases, verbose=self.verbose)
+            return newPrimitive.check_constraints()
         else:
             violation = "A %s is an object or thing that cannot move on its own." %(self.subject)
             self.violations.append(violation)
@@ -221,6 +236,8 @@ class Grasp(PhysicalAction):
     # very naive check
     # beginning of adding in object constraints
     def check_object_constraints(self):
+        if self.object == None:
+            return True
         print("called object constraint")
         if is_graspable(self.object, self.verbose): 
             return True
@@ -260,6 +277,8 @@ class Propel(PhysicalAction):
             return False
 
     def check_object_constraints(self):
+        if self.object == None:
+            return True
         if is_thing(self.object, self.verbose): 
             return True
         else:
@@ -304,6 +323,8 @@ class Ingest(PhysicalAction):
     # very naive check
     # beginning of adding in object constraints
     def check_object_constraints(self):
+        if self.object == None:
+            return True
         print("called object constraint")
         if is_ingestible(self.object, self.verbose): 
             return True
@@ -337,6 +358,7 @@ def isConfusion(item):
     if item in confusions:
         return True
     else: return False
+
 # TODO make a set amount of hops this can search
 # Box is not a plant, but this fails on that
 def is_ingestible(object, verbose=False):
@@ -351,11 +373,13 @@ def is_ingestible(object, verbose=False):
 
 def is_thing(object, verbose=False):
     graspable = ['object', 'vehicle', 'animal', 'plant']
+    print(object, "is thing")
     for item in graspable:
         if has_IsA_edge(object, item, verbose):
             return True
     return False
 
+# TODO change MOVE to be itself or body, and use PROPEL instead ("a man moves a hurricane", should be propel)
 # Some examples that work
 # A classy plant crossed the street
 
