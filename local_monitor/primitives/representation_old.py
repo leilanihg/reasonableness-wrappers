@@ -201,6 +201,8 @@ def get_verbs(tree):
                 for (obj, label) in item.leaves():
                     if label.startswith('N'):
                         verb_object = obj
+                    elif verb_object is None and label.startswith('J'):
+                        verb_object = obj 
                     phrase += obj
                     phrase += ' '
                 if 'object' in phrase:
