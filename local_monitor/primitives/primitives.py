@@ -379,14 +379,6 @@ def is_thing(object, verbose=False):
             return True
     return False
 
-def is_animate(object, verbose=False):
-    animate = ['vehicle', 'person', 'animal']
-    for item in animate:
-        if has_IsA_edge(object, item, verbose):
-            return True
-    return False
-
-
 # TODO change MOVE to be itself or body, and use PROPEL instead ("a man moves a hurricane", should be propel)
 # Some examples that work
 # A classy plant crossed the street
