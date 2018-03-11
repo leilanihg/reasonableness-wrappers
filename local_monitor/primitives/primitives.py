@@ -63,7 +63,11 @@ class ACT:
     # Returns (can_propel, propellor)
     # can_propel = True if it found an object that can propel
     # propellor = Object that can propel, None if does not exist
-    def can_propel(self, contexts):
+    def can_propel(self, contexts, verbose=False):
+        if not contexts:
+            if verbose:
+                print("   No context found")
+            return (False, None)
         for context in contexts:
             if self.verbose:
                 print("Anchor point query: Searching if", context, "is a", \
@@ -378,6 +382,14 @@ def is_thing(object, verbose=False):
         if has_IsA_edge(object, item, verbose):
             return True
     return False
+
+def is_animate(object, verbose=False):
+    animate = ['vehicle', 'person', 'animal']
+    for item in animate:
+        if has_IsA_edge(object, item, verbose):
+            return True
+    return False
+
 
 # TODO change MOVE to be itself or body, and use PROPEL instead ("a man moves a hurricane", should be propel)
 # Some examples that work
