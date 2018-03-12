@@ -1,0 +1,14 @@
+Vehicle reasonability examples
+------------------------------
+The car moves at a green light. 
+ * Green means go
+ * No obstacles in the way
+The car waits at a green light.
+ * Green means go
+ * Inconsistent with stop.
+The car moves at a green light, and pedestrian.... (UNREASONABLE)
+ * Although green means go, green also means "yield to...pedestrian in the road"
+ * There is a pedestrian in the road
+The car waits at a green light, and a pedestrian
+The car moves at a red light (UNREASONABLE)
+ *

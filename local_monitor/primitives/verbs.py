@@ -30,6 +30,13 @@ def is_action_verb(verb, verbose):
         return True
     else: return False
 
+def is_vehicle_move(verb, verbose):
+    if(has_any_edge(verb, 'move', verbose)):
+        return True
+    elif 'move' in verb:
+        return True
+    else: return False
+
 # A linking verb connects a subject to predicate without expressing an action
 # Relating to the five sense (to look, to feel, to smell, to sound, to taste
 # Taken from grammar-monster.com
@@ -108,7 +115,14 @@ def is_ingest_verb(verb, verbose):
 # Just added
 # TODO - add IsA and \HasA
 def get_verb_type(base, subject, object, context, phrases, verbose=False):
-    print(base)
+    # Special case for vehicle primitives
+    if 'car' in subject or 'vehicle' in subject:
+        if verbose:
+            print("checking for VEHICLE verb primitive.")
+        if is_vehicle_move(base, verbose):
+            return Go(subject, base, object, context, phrases, verbose)
+        else:
+            return Wait(subject, base, object, context, phrases, verbose)
     if is_ingest_verb(base, verbose):
         if verbose:
             print("INGEST verb primitive created.")
@@ -128,3 +142,4 @@ def get_verb_type(base, subject, object, context, phrases, verbose=False):
         return Move(subject, base, object, context, phrases, verbose)
     else:
         raise ValueError("don't know how to handle verb {0}".format(base))
+# TODO - I think this is where we want to add the vehicle moves type 

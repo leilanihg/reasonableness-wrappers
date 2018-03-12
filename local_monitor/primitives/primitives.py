@@ -19,8 +19,9 @@ class ACT:
         self.context = context
         self.phrases = phrases
         self.support = []
-        if 'pp' in phrases:
-            self.pp = phrases['pp']
+        if 'preposition' in phrases:
+            print("setting the prepositions")
+            self.pp = phrases['preposition']
         self.violations = []
         self.props = [] # Propositions that NEED to be printed
         self.verbose = verbose # default is false
@@ -346,6 +347,38 @@ class Ingest(PhysicalAction):
         #     print(self.object, "forces itself to go inside of ", self.subject)
         # else:
         #     print(self.object, "is forced to go inside of ", self.subject)
+
+# A specific vehicle type primitive
+class Go(Move):
+    def check_constraints(self):
+        if self.pp:
+            for context in self.pp:
+                if 'green light' in context:
+                    self.support.append("Green means go")
+                    return True
+                elif 'red light' in context:
+                    self.violations.append("A red light means stop, which is inconsistent with go.")
+                    return False
+        return False
+
+    def check_subject_constraints(self):
+        return False
+
+# Another specific vehicle type primitive
+class Wait(Move):
+    def check_constraints(self):
+        return False
+
+    def check_subject_constraints(self):
+        return False
+
+# Another specific vehicle type primitive
+class Yield(Move):
+    def check_constraints(self):
+        return False
+
+    def check_subject_constraints(self):
+        return False
 
 # Made a string builder for python
 def stringBuilder(str_list=None):

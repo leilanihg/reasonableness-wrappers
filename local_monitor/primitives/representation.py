@@ -64,80 +64,7 @@ P -> 'in'
     for tree in parser.parse(tags):
         print(tree)
 
-def another_test():
-    grammar = nltk.parse_cfg("""
-S -> NP VP
-NP -> 'DT' 'NN'
-VP -> 'VB' | 'VBP'
-VP -> 'VB' 'NN'
-""")
-
-    # Make your POS sentence into a list of tokens.
-    sentence = "DT NN VB NN".split(" ")
-
-    # Load the grammar into the ChartParser.
-    cp = nltk.ChartParser(grammar)
-
-    # Generate and print the nbest_parse from the grammar given the sentence tokens.
-    for tree in cp.nbest_parse(sentence):
-        print(tree)
-
-def simple_parse(words):
-    tagged_text = nltk.pos_tag(words)
-    print(tagged_text)
-    pos_tags = [pos for (token,pos) in nltk.pos_tag(words)]
-
-    simple_grammar = nltk.CFG.fromstring("""
-S -> NP VP
-PP -> P NP
-NP -> Det N | Det N PP | 'PRP' | 'NNP'
-VP -> V NP | VP PP
-Det -> 'DT' | 'PRP$'
-N -> 'NN'
-V -> 'VBZ' | 'VBP' | 'VBD' | 'VBG'
-P -> 'PP' | 'IN'
-""")
-
-    parser = nltk.ChartParser(simple_grammar)
-    tree = parser.parse(pos_tags)
-    print(type(tree))
-    for t in tree:
-        print(type(t))
-        print(t)
-        translate_from_simple_parse(t, tagged_text)
-
-# TODO - This seems to work quite well
-# Maybe delete everything else
-# RB JJ CC
-def simple_parse_without(words):
-    tags = nltk.pos_tag(words)
-    print(tags)
-
-    from_string ="""
-S -> NP VP
-NP -> DT NP PP | PRP | Nom | Adj NP | Nom CC Nom
-VP -> V | V VP | V Adj | Adv V | VP PP | VP S | VP NP PP | VP NP
-V -> VB | VBZ | VBP | VBD | VBG | VBN
-Nom -> DT Nom | Adj Nom | NN | NNP | PRP
-Adj -> JJ | JJR | JJS
-Adv -> RB | RBR | RBS
-PP -> P NP
-P -> PP | IN | TO"""
-    for (word, tag) in tags:
-        from_string += "\n"
-        new_tag = tag.replace("$", "")
-        from_string += new_tag
-        from_string += " -> '"
-        from_string += word
-        from_string += "'"
-    simple_grammar = nltk.CFG.fromstring(from_string)
-    parser = nltk.ChartParser(simple_grammar)
-    tree = parser.parse(words)
-    print(type(tree))
-    for t in tree:
-        print(type(t))
-        print(t)
-
+# This is exactly what is used
 def parse_with_regex(words):
     tags = nltk.pos_tag(words)#check_tags(nltk.pos_tag(words))
     log.debug(tags)
@@ -178,7 +105,7 @@ def get_noun_phrase(tree):
         return (noun, phrase.strip())
 
 #
-def get_verbs(tree):
+def get_verbs(tree, verbose=False):
     phrases = {}
     context = []
     verb_object = None
@@ -218,6 +145,9 @@ def get_verbs(tree):
                     phrases['preposition'].append(phrase.strip())
                 else:
                     phrases['preposition'] = [phrase.strip()]
+    if context:
+        if verbose:
+            print("  Context is %s" % phrases)
     return (base_verb, verb_object, context, phrases)
 
 def filter_noun(tree):
@@ -283,8 +213,9 @@ def main():
 
     tree = parse_with_regex(args.sentence)
     (noun, noun_phrase) = get_noun_phrase(tree)
-    (verb, object, context, phrase_dict) = get_verbs(tree)
+    (verb, object, context, phrase_dict) = get_verbs(tree, args.verbose)
     phrase_dict['noun'] = noun_phrase
+    #long_context = phrase_dict['preposition'] 
 
     # get verb type
     act = get_verb_type(verb, noun, object, context, phrase_dict, args.verbose)
