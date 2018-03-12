@@ -219,7 +219,7 @@ def main():
 
     # get verb type
     act = get_verb_type(verb, noun, object, context, phrase_dict, args.verbose)
-    act.check_constraints()
-    act.print_summary()
+    consistent = act.check_constraints()
+    act.print_summary(consistent)
 if __name__ == "__main__":
     main()

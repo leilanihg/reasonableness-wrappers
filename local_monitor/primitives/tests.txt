@@ -12,3 +12,65 @@ The car moves at a green light, and pedestrian.... (UNREASONABLE)
 The car waits at a green light, and a pedestrian
 The car moves at a red light (UNREASONABLE)
  *
+
+TEST CASES
+---------------------------------------------------------------------------
+Example 1 -- GREEN LIGHT
+---------------------------------------------------------------------------
+INPUT : The vehicle moves in a green light
+This perception is reasonable
+=============================================
+Green means go
+So it is reasonable for the vehicle to move
+
+INPUT : The vehicle waits at a green light
+This perception is unreasonable
+=============================================
+A green light means go, which is inconsistent with waiting.
+So it is unreasonable for the vehicle to wait
+
+
+---------------------------------------------------------------------------
+Example 2 -- GREEN LIGHT WITH OBSTRUCTION
+---------------------------------------------------------------------------
+INPUT: The vehicle moves in a green light with a pedestrian in the way.
+This perception is unreasonable
+=============================================
+Although green means go, green also means yields to pedestiran in the road.
+Since there is a pedestrian in the road, move is unreasonable.
+So it is unreasonable for the vehicle to move
+
+INPUT : The vehicle waits at a green light with a pedestrian in the way.
+This perception is reasonable
+=============================================
+Although green means go, green also means yields to pedestiran in the road.
+Since there is a pedestrian in the road, waiting is reasonable.
+So it is reasonable for the vehicle to wait
+
+
+---------------------------------------------------------------------------
+Example 3 -- RED LIGHT
+---------------------------------------------------------------------------
+INPUT: The vehicle moves in a red light
+This perception is unreasonable
+=============================================
+A red light means stop, which is inconsistent with go.
+So it is unreasonable for the vehicle to move
+
+INPUT: The vehicle waits at a red light
+This perception is reasonable
+=============================================
+A red light means stop.
+So it is reasonable for the vehicle to wait
+
+---------------------------------------------------------------------------
+Example 4 -- RED LIGHT WITH EXCEPTION
+---------------------------------------------------------------------------
+INPUT: The vehicle moves in a red light with a pedestrian in the way.
+This perception is unreasonable
+=============================================
+A red light means stop, which is inconsistent with go.
+Since there is a pedestrian in the road, move is unreasonable.
+So it is unreasonable for the vehicle to move
+
+

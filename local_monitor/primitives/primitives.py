@@ -25,6 +25,7 @@ class ACT:
         self.violations = []
         self.props = [] # Propositions that NEED to be printed
         self.verbose = verbose # default is false
+        self.light = None # Special case for the vehicle, may want to change
     def constaints_violated(self):
         if violated:
             return self.constraints
@@ -82,8 +83,8 @@ class ACT:
                 return (True, context)
             return (False, None)
 
-    def print_summary(self):
-        if not self.violations:
+    def print_summary(self, consistent=False):
+        if not self.violations or consistent:
             print("\n")
             print("This perception is reasonable")
             print("=============================================")
@@ -119,6 +120,10 @@ class ACT:
             for element in self.props:
                 summary += " %s" %element
         return summary
+
+    # TODO, may want to fill this in
+    def setLight(self):
+        return False
 
 # There are five primitives for physical actions
 # INGEST - to take something inside an animate object
@@ -351,15 +356,23 @@ class Ingest(PhysicalAction):
 # A specific vehicle type primitive
 class Go(Move):
     def check_constraints(self):
+        consistent = False
         if self.pp:
             for context in self.pp:
                 if 'green light' in context:
+                    self.light = 'green'
                     self.support.append("Green means go")
-                    return True
+                    consistent = True
                 elif 'red light' in context:
+                    self.light = 'red'
                     self.violations.append("A red light means stop, which is inconsistent with go.")
-                    return False
-        return False
+                    consistent = False
+                if 'pedestrian' in context:
+                    if self.light is 'green':
+                        self.violations.append("Although green means go, green also means yields to pedestrian in the road.")
+                    self.violations.append("Since there is a pedestrian in the road, move is unreasonable.")
+                    consistent = False
+        return consistent 
 
     def check_subject_constraints(self):
         return False
@@ -367,7 +380,24 @@ class Go(Move):
 # Another specific vehicle type primitive
 class Wait(Move):
     def check_constraints(self):
-        return False
+        consistent = False
+        if self.pp:
+            for context in self.pp:
+                if 'green light' in context:
+                    self.light = 'green'
+                    self.violations.append("A green light means go, which is inconsistent with waiting.")
+                    consistent = False
+                elif 'red light' in context:
+                    self.light = 'red'
+                    self.support.append("A red light means stop.")
+                    consistent = True
+                if 'pedestrian' in context:
+                    if self.light is 'green':
+                        self.support.append("Although green means go, green also means yields to pedestiran in the road.")
+                    self.support.append("Since there is a pedestrian in the road, waiting is reasonable.")
+                    consistent = True
+        print("consistent is", consistent)
+        return consistent 
 
     def check_subject_constraints(self):
         return False
