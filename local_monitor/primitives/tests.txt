@@ -66,11 +66,26 @@ So it is reasonable for the vehicle to wait
 ---------------------------------------------------------------------------
 Example 4 -- RED LIGHT WITH EXCEPTION
 ---------------------------------------------------------------------------
-INPUT: The vehicle moves in a red light with a pedestrian in the way.
+INPUT: The vehicle turns at a red light.
 This perception is unreasonable
 =============================================
 A red light means stop, which is inconsistent with go.
 Since there is a pedestrian in the road, move is unreasonable.
 So it is unreasonable for the vehicle to move
 
+INPUT: The vehicle waits to turn at a red light. # TODO - parse 
 
+---------------------------------------------------------------------------
+Example 5 -- YELLOW LIGHT 
+---------------------------------------------------------------------------
+INPUT: The vehice moves at a yellow light.
+This perception is unreasonable
+=============================================
+A yellow light means 'stop if safe', which is inconsistent with go.
+So it is unreasonable for the vehicle to go
+
+INPUT: The vehicle waits as a yellow light.
+This perception is reasonable
+=============================================
+A yellow light means 'stop if safe'.  So waiting is reasonable
+So it is reasonable for the vehicle to wait

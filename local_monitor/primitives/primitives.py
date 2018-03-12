@@ -367,6 +367,10 @@ class Go(Move):
                     self.light = 'red'
                     self.violations.append("A red light means stop, which is inconsistent with go.")
                     consistent = False
+                elif 'yellow light' in context:
+                    self.light = 'yellow'
+                    self.violations.append("A yellow light means 'stop if safe', which is inconsistent with go.")
+                    consistent = False
                 if 'pedestrian' in context:
                     if self.light is 'green':
                         self.violations.append("Although green means go, green also means yields to pedestrian in the road.")
@@ -390,6 +394,10 @@ class Wait(Move):
                 elif 'red light' in context:
                     self.light = 'red'
                     self.support.append("A red light means stop.")
+                    consistent = True
+                elif 'yellow light' in context:
+                    self.light = 'yellow'
+                    self.support.append("A yellow light means 'stop if safe'.  So waiting is reasonable")
                     consistent = True
                 if 'pedestrian' in context:
                     if self.light is 'green':
