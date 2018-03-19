@@ -24,11 +24,13 @@ class ACT:
         self.context = context
         self.phrases = phrases
         self.support = []
-        if 'pp' in phrases:
-            self.pp = phrases['pp']
+        if 'preposition' in phrases:
+            print("setting the prepositions")
+            self.pp = phrases['preposition']
         self.violations = []
         self.props = [] # Propositions that NEED to be printed
         self.verbose = verbose # default is false
+        self.light = None # Special case for the vehicle, may want to change
     def constaints_violated(self):
         if violated:
             return self.constraints
@@ -81,7 +83,11 @@ class ACT:
     # Returns (can_propel, propellor)
     # can_propel = True if it found an object that can propel
     # propellor = Object that can propel, None if does not exist
-    def can_propel(self, contexts):
+    def can_propel(self, contexts, verbose=False):
+        if not contexts:
+            if verbose:
+                print("   No context found")
+            return (False, None)
         for context in contexts:
             if self.verbose:
                 print("Anchor point query: Searching if", context, "is a", \
@@ -95,8 +101,8 @@ class ACT:
                 return (True, context)
             return (False, None)
 
-    def print_summary(self):
-        if not self.violations:
+    def print_summary(self, consistent=False):
+        if not self.violations or consistent:
             print("\n")
             print("This perception is reasonable")
             print("=============================================")
@@ -132,6 +138,10 @@ class ACT:
             for element in self.props:
                 summary += " %s" %element
         return summary
+
+    # TODO, may want to fill this in
+    def setLight(self):
+        return False
 
 # There are five primitives for physical actions
 # INGEST - to take something inside an animate object
@@ -387,6 +397,78 @@ class Ingest(PhysicalAction):
 
     def constraints(self):
         return None
+
+    # def summary(self):
+    #     return self.subject + ' to ' + self.verb + ''
+        # if forces_itself:
+        #     print(self.object, "forces itself to go inside of ", self.subject)
+        # else:
+        #     print(self.object, "is forced to go inside of ", self.subject)
+
+# A specific vehicle type primitive
+class Go(Move):
+    def check_constraints(self):
+        consistent = False
+        if self.pp:
+            for context in self.pp:
+                if 'green light' in context:
+                    self.light = 'green'
+                    self.support.append("Green means go")
+                    consistent = True
+                elif 'red light' in context:
+                    self.light = 'red'
+                    self.violations.append("A red light means stop, which is inconsistent with go.")
+                    consistent = False
+                elif 'yellow light' in context:
+                    self.light = 'yellow'
+                    self.violations.append("A yellow light means 'stop if safe', which is inconsistent with go.")
+                    consistent = False
+                if 'pedestrian' in context:
+                    if self.light is 'green':
+                        self.violations.append("Although green means go, green also means yields to pedestrian in the road.")
+                    self.violations.append("Since there is a pedestrian in the road, move is unreasonable.")
+                    consistent = False
+        return consistent 
+
+    def check_subject_constraints(self):
+        return False
+
+# Another specific vehicle type primitive
+class Wait(Move):
+    def check_constraints(self):
+        consistent = False
+        if self.pp:
+            for context in self.pp:
+                if 'green light' in context:
+                    self.light = 'green'
+                    self.violations.append("A green light means go, which is inconsistent with waiting.")
+                    consistent = False
+                elif 'red light' in context:
+                    self.light = 'red'
+                    self.support.append("A red light means stop.")
+                    consistent = True
+                elif 'yellow light' in context:
+                    self.light = 'yellow'
+                    self.support.append("A yellow light means 'stop if safe'.  So waiting is reasonable")
+                    consistent = True
+                if 'pedestrian' in context:
+                    if self.light is 'green':
+                        self.support.append("Although green means go, green also means yields to pedestiran in the road.")
+                    self.support.append("Since there is a pedestrian in the road, waiting is reasonable.")
+                    consistent = True
+        print("consistent is", consistent)
+        return consistent 
+
+    def check_subject_constraints(self):
+        return False
+
+# Another specific vehicle type primitive
+class Yield(Move):
+    def check_constraints(self):
+        return False
+
+    def check_subject_constraints(self):
+        return False
 
 # Made a string builder for python
 def stringBuilder(str_list=None):

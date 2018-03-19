@@ -1,4 +1,4 @@
-# Python class symbolic objects and things
+28# Python class symbolic objects and things
 from sympy import *
 from ..premise.premise import *
 from ..verbs.verbs import *
@@ -125,15 +125,15 @@ class vehicle:
             self.method = method
             self.premises = []
             self.setInitialPremises()
-      def setInitialPremises(self):
+       def setInitialPremises(self):
             self.premises.append(Premise(self.name, 'IsA', 'vehicle'))
             self.premises.append(Premise(self.name, 'action', True)) # can do certain actions
-      def getPremises(self):
+       def getPremises(self):
             return self.premises
-      def writeSummary(self):
+       def writeSummary(self):
             print(self.name + " is a vehicle that moves in/on " + \
                         self.method)
-      def exportRelations(self):
+       def exportRelations(self):
             return self.relations
 
 class place:
