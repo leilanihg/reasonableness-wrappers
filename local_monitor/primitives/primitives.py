@@ -10,6 +10,11 @@ from .search import *
 #     - E.g. speed factor in propel
 # PA  - attributes of an object, of the form STATE(VALUE)
 #     - e.g. COLOR(red)
+PROPEL = "apply a force"
+MOVE = "move"
+INGEST = "ingest"
+GRASP = "grasp"
+
 class ACT:
     def __init__(self, subject, verb, object, context=None, phrases=None, verbose=False):
         self.subject = subject
@@ -27,6 +32,19 @@ class ACT:
     def constaints_violated(self):
         if violated:
             return self.constraints
+
+    def add_subject_support(self, subject, anchor_point, action):
+        self.support.append("A(n) %s is a(n) %s that can %s on their own." % (subject, anchor_point, action))
+    
+    def add_subject_violation(self, subject, action):
+        self.violations.append("A(n) %s can not %s on their own." % (subject, action))
+
+    def add_object_support(self, object, anchor_point, action):
+        self.support.append("A(n) %s is a(n) %s that can be %sed." % (object, anchor_point, action))
+ 
+    def add_object_violation(self, object, action):
+        self.violations.append("A(n) %s can not be %sed." % (object, action))
+
         
     # Added for the new primitives
     def is_animate(self, subject, action='move'):
@@ -194,29 +212,46 @@ class ATrans(StateChange):
 # of itself
 class Move(PhysicalAction):
     # Add types of movement here?
+    def check_constraints(self):
+        reasonable = self.check_subject_constraints() and self.check_object_constraints()
+
+        # if there is context, check for reasonableness there
+        if not reasonable and len(self.context) > 0:
+            # empty summary
+            self.support = []
+            self.violations = []
+            return self.check_context_constraints()
+        else:
+            return reasonable
 
     # Add support here
-    def check_constraints(self):
-        if self.is_animate(self.subject):
+    def check_subject_constraints(self):
+        anchor_point = get_animate(self.subject)
+        if anchor_point != None:
+            self.add_subject_support(self.subject, anchor_point, MOVE)
             return True
+        else:
+            self.add_subject_violation(self.subject, MOVE)
+            return False
 
-        (can_propel, propellor) = self.can_propel(self.context)
-        if can_propel:
-            # make copy of context list and remove propellor
-            contexts = self.context.copy()
-            contexts.remove(propellor)
-
+    def check_context_constraints(self):
+        # (can_propel, propellor) = self.can_propel(self.context)
+        # if can_propel:
+        if self.context == None:
+            return False
+        for context in self.context:
+            # make copy of context list and remove context
+            contexts_copy = self.context.copy()
+            contexts_copy.remove(context)
             # Propel has other constraints, so we need to make a Propel object and check that
             # Change sentence structure so context is subject, and verb type is propel
             if self.verbose:
                 print("PROPEL verb primitive created.")
-            newPrimitive = Propel(subject=propellor, verb=self.verb, object=self.object, 
-                context=contexts, phrases=self.phrases, verbose=self.verbose)
-            return newPrimitive.check_constraints()
-        else:
-            violation = "A %s is an object or thing that cannot move on its own." %(self.subject)
-            self.violations.append(violation)
-            return False
+                newPrimitive = Propel(subject=context, verb=self.verb, object=self.object, 
+                    context=contexts_copy, phrases=self.phrases, verbose=self.verbose)
+            reasonable = newPrimitive.check_constraints()
+            if reasonable:
+                self.support.append("Although a %s cannot move on its own, it can be propeled by a %s."%(self.subject, context))
 
 # A person, object or thing grabs hold of another person,
 # object or thing, or becomes attatched to another person
@@ -228,10 +263,18 @@ class Grasp(PhysicalAction):
     def constraints(self):
         return None
     
-    # def check_constraints(self):
-    #     return self.check_subject_constraints() and self.check_object_constraints()
+    def check_constraints(self):
+        return self.check_subject_constraints() and self.check_object_constraints()
 
-    # def check_subject_constraints(self):
+    # Add support here
+    def check_subject_constraints(self):
+        anchor_point = get_animate(self.subject)
+        if anchor_point != None:
+            self.add_subject_support(self.subject, anchor_point, GRASP)
+            return True
+        else:
+            self.add_subject_violation(self.subject, GRASP)
+            return False
 
     # very naive check
     # beginning of adding in object constraints
@@ -239,7 +282,9 @@ class Grasp(PhysicalAction):
         if self.object == None:
             return True
         print("called object constraint")
-        if is_graspable(self.object, self.verbose): 
+        anchor_point = get_graspable(self.object, self.verbose)
+        if anchor_point != None:
+            self.add_object_support(self.object, anchor_point, GRASP) 
             return True
         else:
             violation = "A %s is not graspable." %(self.object)
@@ -247,11 +292,11 @@ class Grasp(PhysicalAction):
             return False
 
 
-    def summary(self):
-        if self.grabs:
-            print(self.subject, "grabs", self.object)
-        else:
-            print(self.subject, "becomes attatched to ", self.object)
+    # def summary(self):
+    #     if self.grabs:
+    #         print(self.subject, "grabs", self.object)
+    #     else:
+    #         print(self.subject, "becomes attatched to ", self.object)
 
 # A person, object or thing applies a force to another person,
 # object or thing, or a moving person, object or thing
@@ -267,9 +312,9 @@ class Propel(PhysicalAction):
         return self.check_subject_constraints() and self.check_object_constraints()
 
     def check_subject_constraints(self):
-        if self.is_animate(self.subject, "apply a force"):
-            return True
-        elif self.can_propel(self.context):
+        anchor_point = get_propel(self.subject, self.verbose)
+        if anchor_point != None:
+            self.add_subject_support(self.subject, anchor_point, PROPEL)
             return True
         else:
             violation = "A %s is an object or thing that cannot move on its own." %(self.subject)
@@ -279,7 +324,8 @@ class Propel(PhysicalAction):
     def check_object_constraints(self):
         if self.object == None:
             return True
-        if is_thing(self.object, self.verbose): 
+        if not is_confusion(self.object): 
+            self.add_object_support(self.object, 'item', PROPEL)
             return True
         else:
             violation = "A %s cannot be propeled" %(self.object)
@@ -313,11 +359,14 @@ class Ingest(PhysicalAction):
         return self.check_subject_constraints() and self.check_object_constraints()
 
     def check_subject_constraints(self):
-        if self.is_animate(self.subject, action='ingest'):
+        anchor_point = get_animate(self.subject, self.verbose)
+        if anchor_point != None:
+            self.add_subject_support(self.subject, anchor_point, INGEST)
             return True
         else:
-            violation = "A %s is an object or thing that cannot ingest." %(self.subject)
-            self.violations.append(violation)
+            # violation = "A %s is an object or thing that cannot ingest." %(self.subject)
+            # self.violations.append(violation)
+            self.add_subject_violation(self.subject, INGEST)
             return False
 
     # very naive check
@@ -326,22 +375,18 @@ class Ingest(PhysicalAction):
         if self.object == None:
             return True
         print("called object constraint")
-        if is_ingestible(self.object, self.verbose): 
+        anchor_point = get_animate(self.object, self.verbose)
+        if anchor_point != None: 
+            self.add_object_support(self.object, anchor_point, "ingest")
             return True
         else:
             violation = "A %s is not a plant, animal, or liquid and therefore cannot be ingested" %(self.object)
             self.violations.append(violation)
+            # TODO add a list of things that it cant be
             return False
 
     def constraints(self):
         return None
-
-    # def summary(self):
-    #     return self.subject + ' to ' + self.verb + ''
-        # if forces_itself:
-        #     print(self.object, "forces itself to go inside of ", self.subject)
-        # else:
-        #     print(self.object, "is forced to go inside of ", self.subject)
 
 # Made a string builder for python
 def stringBuilder(str_list=None):
@@ -352,7 +397,7 @@ def stringBuilder(str_list=None):
     return ''.join(space_list).strip()
 
 # A force that can move things
-def isConfusion(item):
+def is_confusion(item):
     # TODO Can try to populate this list with ConceptNet
     confusions = ['hurricane', 'storm', 'earthquake']
     if item in confusions:
@@ -361,30 +406,44 @@ def isConfusion(item):
 
 # TODO make a set amount of hops this can search
 # Box is not a plant, but this fails on that
-def is_ingestible(object, verbose=False):
+
+# If it is ingestible, returns specific anchor point
+# Otherwise returns false
+def get_ingestible(object, verbose=False):
     # TODO Can try to populate this list with ConceptNet
     # TODO make conceptnet search to add "an animal, the animal", etc to the search
-    ingestible = ['animal', 'plant', 'liquid']
+    ingestible = ['animal', 'plant', 'food', 'liquid']
     for item in ingestible:
         if has_IsA_edge(object, item, verbose):
-            return True
-    return False
+            return item
+    return None
     # TODO House has edge with one of these. 
 
-def is_thing(object, verbose=False):
+# If it is a thing, returns specific anchor point
+# Otherwise returns false
+def get_thing(object, verbose=False):
     graspable = ['object', 'vehicle', 'animal', 'plant']
     print(object, "is thing")
     for item in graspable:
         if has_IsA_edge(object, item, verbose):
-            return True
-    return False
+            return item
+    return None
 
-def is_animate(object, verbose=False):
+# If it is animate, returns specific anchor point
+# Otherwise returns false
+def get_animate(object, verbose=False):
     animate = ['vehicle', 'person', 'animal']
     for item in animate:
         if has_IsA_edge(object, item, verbose):
-            return True
-    return False
+            return item
+    return None
+
+def get_propel(object, verbose=False):
+    propel = ['vehicle', 'person', 'animal', 'force', 'storm']
+    for item in propel:
+        if has_IsA_edge(object, item, verbose):
+            return item
+    return None
 
 
 # TODO change MOVE to be itself or body, and use PROPEL instead ("a man moves a hurricane", should be propel)
