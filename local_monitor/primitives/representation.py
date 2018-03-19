@@ -75,7 +75,7 @@ def parse_with_regex(words):
     V: {<V.*>}          # Verb
     PP: {<P> <NP>}      # PP -> P NP
     Adv: {<RB|RBR|RBS>} # Adverbs
-    VP: {<V V*> <NP|PP>*}  # VP -> V (NP|PP)*
+    VP: {<V V*|V P V> <NP|PP>*}  # VP -> V (NP|PP)*
     ''')
     result = parser.parse(tags)
     result.draw()
