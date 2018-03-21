@@ -115,14 +115,6 @@ def is_ingest_verb(verb, verbose):
 # Just added
 # TODO - add IsA and \HasA
 def get_verb_type(base, subject, object, context, phrases, verbose=False):
-    # Special case for vehicle primitives
-    if 'car' in subject or 'vehicle' in subject:
-        if verbose:
-            print("checking for VEHICLE verb primitive.")
-        if is_vehicle_move(base, verbose):
-            return Go(subject, base, object, context, phrases, verbose)
-        else:
-            return Wait(subject, base, object, context, phrases, verbose)
     if is_ingest_verb(base, verbose):
         if verbose:
             print("INGEST verb primitive created.")

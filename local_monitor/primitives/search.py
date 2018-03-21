@@ -8,7 +8,7 @@ def eprint(*args, **kwargs):
 
 # TODO change from finding IsA path to any relation path
 # Check with how this can work with ConceptNet
-def find_IsA_path(start, end, path=None, queue=None, seen=None):
+def find_IsA_path(start, end, path=None, queue=None, seen=None, verbose=False):
     if path is None:
         path = []
         path.append(clean_search(start))
@@ -27,7 +27,7 @@ def find_IsA_path(start, end, path=None, queue=None, seen=None):
     edges = obj['edges']
     
     if(has_IsA_edge(start,end)):
-        if(debug):
+        if(verbose):
             eprint("Found an edge between", start, "and", end)
         path.append(end)
         return path
@@ -50,8 +50,8 @@ def find_IsA_path(start, end, path=None, queue=None, seen=None):
         merged_queue = []
         merged_queue.extend(new_queue)
         merged_queue.extend(queue)
-        if debug: 
-            eprint("new queue is ", merged_queue)
+        # if verbose: 
+        #     eprint("new queue is ", merged_queue)
         if merged_queue:
             node = merged_queue.pop(0)[0]
             if node not in path:
@@ -89,22 +89,22 @@ def clean_search(input):
 
 # Checks if there is any correlation (just an edge)
 # Only to be used for verb primitives, otherwise not strong enough correlation
-def has_any_edge(word, verb_primitive, verbose=False):
+def has_any_edge(word, object, verbose=False):
     word_text = word.replace(" ", "_").lower()
     if verbose:
         print("ConceptNet Query: Searching for an edge between", word, \
-                  "and the verb primitive", verb_primitive)
+                  "and the verb primitive", object)
     obj = requests.get('http://api.conceptnet.io/query?node=/c/en/'+word_text+\
-                           '&other=/c/en/'+verb_primitive).json()
+                           '&other=/c/en/'+object).json()
     edges = obj['edges']
     if(edges):
         if verbose:
-            print("  Edge found between", word, "and the verb primitive", verb_primitive)
+            print("  Edge found between", word, "and ", object)
         return True
     else:
         if verbose:
-            print("  No edge found between", word, "and the verb primitive", verb_primitive)
-            print("  Going to search for the next the verb primitive")
+            print("  No edge found between", word, "and ", object)
+            # print("  Going to search for the next the verb primitive")
         return False
 
 # First check if there is a direct connection via an IsA relation
