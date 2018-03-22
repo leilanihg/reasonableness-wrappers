@@ -1,5 +1,6 @@
 from .search import *
 from .primitives import *
+from .physical_actions import expel, grasp, ingest, move, propel
 
 # Moving - is there an edge between action and move
 # Linking - perhaps an exact check
@@ -118,7 +119,7 @@ def get_verb_type(base, subject, object, context, phrases, verbose=False):
     if is_ingest_verb(base, verbose):
         if verbose:
             print("INGEST verb primitive created.")
-        return Ingest(subject, base, object, context, phrases, verbose)
+        return ingest.Ingest(subject, base, object, context, phrases, verbose)
 
     if is_communication_verb(base, verbose):
         if verbose:
@@ -127,11 +128,11 @@ def get_verb_type(base, subject, object, context, phrases, verbose=False):
     elif is_propel_verb(base, verbose):
         if verbose:
             print("PROPEL verb primitive created.")
-        return Propel(subject, base, object, context, phrases, verbose)
+        return propel.Propel(subject, base, object, context, phrases, verbose)
     elif is_action_verb(base, verbose):
         if verbose:
             print("MOVE verb primitive created.")
-        return Move(subject, base, object, context, phrases, verbose)
+        return move.Move(subject, base, object, context, phrases, verbose)
     else:
         raise ValueError("don't know how to handle verb {0}".format(base))
 # TODO - I think this is where we want to add the vehicle moves type 
