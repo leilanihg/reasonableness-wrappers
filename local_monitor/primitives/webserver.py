@@ -15,6 +15,11 @@ from .search import *
 from .verbs import *
 from .representation import *
 
+import io
+log_data = io.StringIO()
+log.basicConfig(stream=log_data, format="%(levelname)s: %(message)s",
+                level=log.DEBUG)
+
 from flask import Flask, request, json, render_template
 app = Flask(__name__)
 
@@ -51,7 +56,10 @@ def evaluate():
     act = get_verb_type(verb, noun, object, context, phrase_dict, False)
     act.check_constraints()
 
-    return app.make_response(json.jsonify(act.summary_info()))
+    resp = act.summary_info()
+    resp['log_data'] = log_data.getvalue()
+
+    return app.make_response(json.jsonify(resp))
 
 @app.route("/api/1/caption", methods=['POST'])
 def caption():

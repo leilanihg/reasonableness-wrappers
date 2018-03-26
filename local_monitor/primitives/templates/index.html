@@ -23,7 +23,7 @@
             <div class="col-md-12">
                 <div class="media">
                     <div id="image_container" class="mr-3 border" style="width:200px;height:200px">
-                        <img src="static/img/car_at_red.jpg" style="width:100%;height:100%" />
+                        <img id="the_image" src="static/img/car_at_red.jpg" style="width:100%;height:100%" />
                     </div>
                     <div class="media-body">
                       <div class="row">
@@ -36,15 +36,15 @@
                                   <div class="row">
                                     <div class="col-md-6">
                                       <div class="form-check">
-                                        <input class="form-check-input" type="radio" name="lightColor" id="lightColorRed" value="option1">
+                                        <input class="form-check-input" type="radio" name="lightColor" id="lightColorRed" value="red" checked>
                                         <label class="form-check-label" for="lightColorRed">Red</label>
                                       </div>
                                       <div class="form-check">
-                                        <input class="form-check-input" type="radio" name="lightColor" id="lightColorYellow" value="option2">
+                                        <input class="form-check-input" type="radio" name="lightColor" id="lightColorYellow" value="yellow">
                                         <label class="form-check-label" for="lightColorYellow">Yellow</label>
                                       </div>
                                       <div class="form-check">
-                                        <input class="form-check-input" type="radio" name="lightColor" id="lightColorGreen" value="option3">
+                                        <input class="form-check-input" type="radio" name="lightColor" id="lightColorGreen" value="green">
                                         <label class="form-check-label" for="lightColorGreen">Green</label>
                                       </div>
                                     </div>
@@ -65,15 +65,15 @@
                                 </div>
                                 <div class="card-body">
                                   <div class="form-check">
-                                    <input class="form-check-input" type="radio" name="intent" id="intentWait" value="option1">
+                                    <input class="form-check-input" type="radio" name="intent" id="intentWait" value="waits" checked>
                                     <label class="form-check-label" for="intentWait">Wait</label>
                                   </div>
                                   <div class="form-check">
-                                    <input class="form-check-input" type="radio" name="intent" id="intentGoForward" value="option2">
+                                    <input class="form-check-input" type="radio" name="intent" id="intentGoForward" value="goes">
                                     <label class="form-check-label" for="intentGoForward">Go forward</label>
                                   </div>
                                   <div class="form-check">
-                                    <input class="form-check-input" type="radio" name="intent" id="intentGoRight" value="option3">
+                                    <input class="form-check-input" type="radio" name="intent" id="intentGoRight" value="turns">
                                     <label class="form-check-label" for="intentGoRight">Go right</label>
                                   </div>
                                 </div>
@@ -86,15 +86,15 @@
                                 </div>
                                 <div class="card-body">
                                   <div class="form-check">
-                                    <input class="form-check-input" type="radio" name="vehicleState" id="vehicleStateStopped" value="option1">
+                                    <input class="form-check-input" type="radio" name="vehicleState" id="vehicleStateStopped" value="option1" disabled>
                                     <label class="form-check-label" for="inlineRadio1">Stopped</label>
                                   </div>
                                   <div class="form-check">
-                                    <input class="form-check-input" type="radio" name="vehicleState" id="vehicleStateSlow" value="option2">
+                                    <input class="form-check-input" type="radio" name="vehicleState" id="vehicleStateSlow" value="option2" disabled>
                                     <label class="form-check-label" for="inlineRadio2">Moving slowly</label>
                                   </div>
                                   <div class="form-check">
-                                    <input class="form-check-input" type="radio" name="vehicleState" id="vehicleStateFast" value="option3">
+                                    <input class="form-check-input" type="radio" name="vehicleState" id="vehicleStateFast" value="option3" disabled>
                                     <label class="form-check-label" for="inlineRadio3">Moving quickly</label>
                                   </div>
                                 </div>
@@ -159,7 +159,18 @@
       $('#captioning_badge').show();
       window.setTimeout(function(){
         $('#captioning_badge').hide();
-        $('#caption_container').val('The vehicle waits at a red light');
+
+        let lightColor = document.getElementById('image_form').elements['lightColor'].value;
+
+        let intent = document.getElementById('image_form').elements['intent'].value;
+
+        let pedestrian = '';
+        if($('#pedestrianCheck').prop('checked'))
+        {
+          pedestrian = ' with a pedestrian';
+        }
+
+        $('#caption_container').val(`The vehicle ${intent} at a ${lightColor} light${pedestrian}`);
       }, 1000);
 
 
@@ -224,6 +235,18 @@
 
     $('#image_container').click(g1);
 */
+
+    $('#lightColorRed').click(function(e){
+      $('#the_image').attr('src', 'static/img/car_at_red.jpg');
+    });
+    $('#lightColorYellow').click(function(e){
+      $('#the_image').attr('src', 'static/img/car_at_yellow.jpg');
+    });
+    $('#lightColorGreen').click(function(e){
+      $('#the_image').attr('src', 'static/img/car_at_green.jpg');
+    });
+
+
     $('#evaluate_button').click(function(e){
       e.preventDefault();
 
