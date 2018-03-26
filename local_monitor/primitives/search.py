@@ -9,7 +9,7 @@ query_prefix = 'http://api.conceptnet.io/c/en/'
 
 # TODO change from finding IsA path to any relation path
 # Check with how this can work with ConceptNet
-def find_IsA_path(start, end, path=None, queue=None, seen=None):
+def find_IsA_path(start, end, path=None, queue=None, seen=None, verbose=False):
     if path is None:
         path = []
         path.append(clean_search(start))
@@ -87,19 +87,19 @@ def clean_search(input):
 
 # Checks if there is any correlation (just an edge)
 # Only to be used for verb primitives, otherwise not strong enough correlation
-def has_any_edge(word, verb_primitive, verbose=False):
+def has_any_edge(word, concept, verbose=False):
     word_text = word.replace(" ", "_").lower()
     log.debug("ConceptNet Query: Searching for an edge between %s \
-and the verb primitive %s" %(word, verb_primitive))
-    
+and the verb primitive %s" %(word, concept))
     obj = requests.get('http://api.conceptnet.io/query?node=/c/en/'+word_text+\
-                           '&other=/c/en/'+verb_primitive).json()
+                           '&other=/c/en/'+concept).json()
     edges = obj['edges']
     if(edges):
-        log.debug("Edge found between %s and the verb primitive %s" %(word,verb_primitive))
+        log.debug("Edge found between %s and the verb primitive %s"
+                  %(word,concept))
         return True
     else:
-        log.debug("No edge found between %s and the verb primitive %s"(word, verb_primitive))
+        log.debug("No edge found between %s and the verb primitive %s" %(word, concept))
         log.debug("Going to search for the next the verb primitive")
         return False
 
