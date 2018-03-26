@@ -1,10 +1,11 @@
 import requests
+import logging as log # Suggestion from stackoverflow
+import sys
+
+#log.basicConfig(stream=sys.stdout, level=logging.INFO)
+#log.info("Hello world")
 
 query_prefix = 'http://api.conceptnet.io/c/en/'
-
-# Used to printint to sderr
-def eprint(*args, **kwargs):
-    print(*args, file=sys.stderr, **kwargs)
 
 # TODO change from finding IsA path to any relation path
 # Check with how this can work with ConceptNet
@@ -20,15 +21,13 @@ def find_IsA_path(start, end, path=None, queue=None, seen=None):
         seen = []
         
     search = clean_search(start)
-    if verbose:
-        print("Now searching through the IsA hiearchy for", search, path)
-        print("We've seen %s"% seen)
+    log.debug("Now searching through the IsA hiearchy for", search, path)
+    log.debug("We've seen %s"% seen)
     obj = requests.get(query_prefix+search+'?rel=/r/IsA&limit=1000').json()
     edges = obj['edges']
     
     if(has_IsA_edge(start,end)):
-        if(debug):
-            eprint("Found an edge between", start, "and", end)
+        log.debug("Found an edge between %s and %s" %(start, end))
         path.append(end)
         return path
     else:
@@ -50,19 +49,18 @@ def find_IsA_path(start, end, path=None, queue=None, seen=None):
         merged_queue = []
         merged_queue.extend(new_queue)
         merged_queue.extend(queue)
-        if debug: 
-            eprint("new queue is ", merged_queue)
+        log.debug("new queue is %s" %merged_queue)
         if merged_queue:
             node = merged_queue.pop(0)[0]
             if node not in path:
                 if(len(path) < limit-1 ):
-                    if(debug): eprint("recursing with ", node)
+                    log.debug("recursing with %s" %node)
                     path.append(node)
                     newpath = find_IsA_path(node, end, path, merged_queue, seen)
                     return newpath
                 else: # we've gone too far
                     if not (containsConcept(end, merged_queue)):
-                        if(debug): eprint("We've gone too far")
+                        log.debug("We've gone too far")
                         path.pop()
                         node=path[-1]
                         newpath = find_IsA_path(node, end, path, 
@@ -91,20 +89,18 @@ def clean_search(input):
 # Only to be used for verb primitives, otherwise not strong enough correlation
 def has_any_edge(word, verb_primitive, verbose=False):
     word_text = word.replace(" ", "_").lower()
-    if verbose:
-        print("ConceptNet Query: Searching for an edge between", word, \
-                  "and the verb primitive", verb_primitive)
+    log.debug("ConceptNet Query: Searching for an edge between %s \
+and the verb primitive %s" %(word, verb_primitive))
+    
     obj = requests.get('http://api.conceptnet.io/query?node=/c/en/'+word_text+\
                            '&other=/c/en/'+verb_primitive).json()
     edges = obj['edges']
     if(edges):
-        if verbose:
-            print("  Edge found between", word, "and the verb primitive", verb_primitive)
+        log.debug("Edge found between %s and the verb primitive %s" %(word,verb_primitive))
         return True
     else:
-        if verbose:
-            print("  No edge found between", word, "and the verb primitive", verb_primitive)
-            print("  Going to search for the next the verb primitive")
+        log.debug("No edge found between %s and the verb primitive %s"(word, verb_primitive))
+        log.debug("Going to search for the next the verb primitive")
         return False
 
 # First check if there is a direct connection via an IsA relation
@@ -113,20 +109,17 @@ def has_IsA_edge(word, concept, verbose=False):
 
     obj = requests.get(query_prefix+word_text+'?rel=/r/IsA&limit=1000').json()
     edges = obj['edges']
-    if verbose:
-        print("ConceptNet Query: Searching for an IsA relation between", \
-                  word, "and the anchor point", concept)
+    log.debug("ConceptNet Query: Searching for an IsA relation between %s \
+                  and the anchor point %s" %(word,concept))
     for edge in edges:
         start = edge['start']['label'].lower()
         end = edge['end']['label'].lower()
 
         if(search_equals(word, start) and isA_equals(concept, end.lower())):
-            if verbose:
-                print("  IsA relation found;", word, "bound to the anchor point",\
-                          concept)
+            log.debug("IsA relation found; %s bound to the anchor point %s"\
+                          %(word,concept))
             return True
-    if verbose:
-        print("  No IsA relation found.")
+    log.debug(" IsA relation found.")
     return False
 
 def has_edge(word, concept, relation):

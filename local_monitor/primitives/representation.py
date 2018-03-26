@@ -68,7 +68,6 @@ P -> 'in'
 def parse_with_regex(words):
     tags = nltk.pos_tag(words)#check_tags(nltk.pos_tag(words))
     log.debug(tags)
-    #grammar = "NP: {<DT>?<JJ>*<NN>}"
     parser = nltk.RegexpParser('''
     NP: {<DT|PRP$>? <JJ>* <NN|NNP|PRP>*} # NP
     P: {<IN|TO>}           # Preposition
@@ -78,7 +77,7 @@ def parse_with_regex(words):
     VP: {<V V*|V P V> <NP|PP>*}  # VP -> V (NP|PP)*
     ''')
     result = parser.parse(tags)
-    result.draw()
+    #result.draw()
     #log.debug(result.draw())
     return result
 
@@ -146,8 +145,7 @@ def get_verbs(tree, verbose=False):
                 else:
                     phrases['preposition'] = [phrase.strip()]
     if context:
-        if verbose:
-            print("  Context is %s" % phrases)
+        log.info("  Context is %s" % phrases)
     return (base_verb, verb_object, context, phrases)
 
 def filter_noun(tree):
@@ -168,7 +166,6 @@ def translate_from_simple_parse(tree, tagged_text):
 def test_again(tokens):
     tag_dict = defaultdict(list)
 
-    # Tag
     tagged_sent = nltk.pos_tag(tokens)
 
     # Put tags and words into the dictionary
@@ -195,21 +192,14 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('sentence', nargs='+',
                     help='Sentence')
-    parser.add_argument("-d", "--debug", action='store_true',
-                        help='print debug messages to stderr')
     parser.add_argument("-v", "--verbose", action='store_true',
                         help='This is the same as debug right now')
     args = parser.parse_args()
 
-
-    if args.debug:
-        log.basicConfig(format="%(levelname)s: %(message)s",
+    if args.verbose:
+        log.basicConfig(stream=sys.stdout, format="%(levelname)s: %(message)s",
                         level=log.DEBUG)
         log.info("Verbose output.")
-    else:
-        log.basicConfig(format="%(levelname)s: %(message)s")
-    if args.verbose:
-        print("INFO: Verbose OUTPUT\n")
 
     tree = parse_with_regex(args.sentence)
     (noun, noun_phrase) = get_noun_phrase(tree)

@@ -20,7 +20,7 @@ class ACT:
         self.phrases = phrases
         self.support = []
         if 'preposition' in phrases:
-            print("setting the prepositions")
+            log.debug("setting the prepositions")
             self.pp = phrases['preposition']
         self.violations = []
         self.props = [] # Propositions that NEED to be printed
@@ -67,16 +67,13 @@ class ACT:
     # propellor = Object that can propel, None if does not exist
     def can_propel(self, contexts, verbose=False):
         if not contexts:
-            if verbose:
-                print("   No context found")
+            log.debug("No context found")
             return (False, None)
         for context in contexts:
-            if self.verbose:
-                print("Anchor point query: Searching if", context, "is a", \
-                          "confusion anchor point")
+            log.debug("Anchor point query: Searching if %s is a \
+                          confusion anchor point" %context)
             if isConfusion(context):
-                if self.verbose:
-                    print("  Confusion quality found for", context)
+                log.debug("  Confusion quality found for %s" %context)
                 str = "Although a  %s cannot move on its own, a %s can propel a stationary object to move." % (self.subject, context)
                 self.support.append(str)
                 self.props.append("in a %s" %context)
@@ -218,8 +215,7 @@ class Move(PhysicalAction):
 
             # Propel has other constraints, so we need to make a Propel object and check that
             # Change sentence structure so context is subject, and verb type is propel
-            if self.verbose:
-                print("PROPEL verb primitive created.")
+            log.debug("PROPEL verb primitive created.")
             newPrimitive = Propel(subject=propellor, verb=self.verb, object=self.object, 
                 context=contexts, phrases=self.phrases, verbose=self.verbose)
             return newPrimitive.check_constraints()
