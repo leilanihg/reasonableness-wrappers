@@ -449,7 +449,7 @@ class Wait(Move):
                     consistent = True
                 if 'pedestrian' in context:
                     if self.light is 'green':
-                        self.support.append("Although green means go, green also means yields to pedestiran in the road.")
+                        self.support.append("Although green means go, green also means yields to pedestrian in the road.")
                     self.support.append("Since there is a pedestrian in the road, waiting is reasonable.")
                     consistent = True
         log.debug("Checked constraints: consistent is %s" %consistent)
