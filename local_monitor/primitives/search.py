@@ -1,10 +1,7 @@
 import requests
+import logging as log
 
 query_prefix = 'http://api.conceptnet.io/c/en/'
-
-# Used to printint to sderr
-def eprint(*args, **kwargs):
-    print(*args, file=sys.stderr, **kwargs)
 
 # TODO change from finding IsA path to any relation path
 # Check with how this can work with ConceptNet
@@ -27,8 +24,7 @@ def find_IsA_path(start, end, path=None, queue=None, seen=None):
     edges = obj['edges']
     
     if(has_IsA_edge(start,end)):
-        if(debug):
-            eprint("Found an edge between", start, "and", end)
+        log.debug("Found an edge between and %s" %(start,end))
         path.append(end)
         return path
     else:
@@ -50,19 +46,18 @@ def find_IsA_path(start, end, path=None, queue=None, seen=None):
         merged_queue = []
         merged_queue.extend(new_queue)
         merged_queue.extend(queue)
-        if debug: 
-            eprint("new queue is ", merged_queue)
+        log.debug("new queue is %s" %merged_queue)
         if merged_queue:
             node = merged_queue.pop(0)[0]
             if node not in path:
                 if(len(path) < limit-1 ):
-                    if(debug): eprint("recursing with ", node)
+                    log.debug("recursing with %s" %node)
                     path.append(node)
                     newpath = find_IsA_path(node, end, path, merged_queue, seen)
                     return newpath
                 else: # we've gone too far
                     if not (containsConcept(end, merged_queue)):
-                        if(debug): eprint("We've gone too far")
+                        log.debug("We've gone too far")
                         path.pop()
                         node=path[-1]
                         newpath = find_IsA_path(node, end, path, 
@@ -91,9 +86,8 @@ def clean_search(input):
 # Only to be used for verb primitives, otherwise not strong enough correlation
 def has_any_edge(word, verb_primitive, verbose=False):
     word_text = word.replace(" ", "_").lower()
-    if verbose:
-        print("ConceptNet Query: Searching for an edge between", word, \
-                  "and the verb primitive", verb_primitive)
+    log.debug("ConceptNet Query: Searching for an edge between %s and the verb primitive %s" 
+              %(word,verb_primitive))
     obj = requests.get('http://api.conceptnet.io/query?node=/c/en/'+word_text+\
                            '&other=/c/en/'+verb_primitive).json()
     edges = obj['edges']
