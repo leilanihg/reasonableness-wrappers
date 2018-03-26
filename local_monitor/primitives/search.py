@@ -17,9 +17,8 @@ def find_IsA_path(start, end, path=None, queue=None, seen=None):
         seen = []
         
     search = clean_search(start)
-    if verbose:
-        print("Now searching through the IsA hiearchy for", search, path)
-        print("We've seen %s"% seen)
+    log.debug("Now searching through the IsA hiearchy for %s %s"%(search, path))
+    log.debug("We've seen %s"% seen)
     obj = requests.get(query_prefix+search+'?rel=/r/IsA&limit=1000').json()
     edges = obj['edges']
     
@@ -92,13 +91,13 @@ def has_any_edge(word, verb_primitive, verbose=False):
                            '&other=/c/en/'+verb_primitive).json()
     edges = obj['edges']
     if(edges):
-        if verbose:
-            print("  Edge found between", word, "and the verb primitive", verb_primitive)
+        log.debug("Edges found between %s and the verb primitive %s" 
+                  %(word,verb_primitive))
         return True
     else:
-        if verbose:
-            print("  No edge found between", word, "and the verb primitive", verb_primitive)
-            print("  Going to search for the next the verb primitive")
+        log.debug("No edge found between %s and the verb primitive %s"
+                  %(word,verb_primitive))
+        log.debug("Going to search for the next the verb primitive")
         return False
 
 # First check if there is a direct connection via an IsA relation
@@ -107,20 +106,17 @@ def has_IsA_edge(word, concept, verbose=False):
 
     obj = requests.get(query_prefix+word_text+'?rel=/r/IsA&limit=1000').json()
     edges = obj['edges']
-    if verbose:
-        print("ConceptNet Query: Searching for an IsA relation between", \
-                  word, "and the anchor point", concept)
+    log.debug("ConceptNet Query: Searching for an IsA relation between %s and the anchor point %s"
+              %(word,concept))
     for edge in edges:
         start = edge['start']['label'].lower()
         end = edge['end']['label'].lower()
 
         if(search_equals(word, start) and isA_equals(concept, end.lower())):
-            if verbose:
-                print("  IsA relation found;", word, "bound to the anchor point",\
-                          concept)
+            log.debug("IsA relation found; %s bound to the anchor point %s"
+                          %(word,concept))
             return True
-    if verbose:
-        print("  No IsA relation found.")
+    log.debug("No IsA relation found.")
     return False
 
 def has_edge(word, concept, relation):

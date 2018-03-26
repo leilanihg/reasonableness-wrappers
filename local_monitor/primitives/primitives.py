@@ -25,7 +25,7 @@ class ACT:
         self.phrases = phrases
         self.support = []
         if 'preposition' in phrases:
-            print("setting the prepositions")
+            log.debug("Setting the prepositions")
             self.pp = phrases['preposition']
         self.violations = []
         self.props = [] # Propositions that NEED to be printed
@@ -85,16 +85,13 @@ class ACT:
     # propellor = Object that can propel, None if does not exist
     def can_propel(self, contexts, verbose=False):
         if not contexts:
-            if verbose:
-                print("   No context found")
+            log.debug("   No context found")
             return (False, None)
         for context in contexts:
-            if self.verbose:
-                print("Anchor point query: Searching if", context, "is a", \
-                          "confusion anchor point")
+            log.debug("Anchor point query: Searching if %s is a confusion anchor point"
+                      %context)
             if isConfusion(context):
-                if self.verbose:
-                    print("  Confusion quality found for", context)
+                log.debug("Confusion quality found for %s" %context)
                 str = "Although a  %s cannot move on its own, a %s can propel a stationary object to move." % (self.subject, context)
                 self.support.append(str)
                 self.props.append("in a %s" %context)
@@ -255,9 +252,8 @@ class Move(PhysicalAction):
             contexts_copy.remove(context)
             # Propel has other constraints, so we need to make a Propel object and check that
             # Change sentence structure so context is subject, and verb type is propel
-            if self.verbose:
-                print("PROPEL verb primitive created.")
-                newPrimitive = Propel(subject=context, verb=self.verb, object=self.object, 
+            log.debug("PROPEL verb primitive created.")
+            newPrimitive = Propel(subject=context, verb=self.verb, object=self.object, 
                     context=contexts_copy, phrases=self.phrases, verbose=self.verbose)
             reasonable = newPrimitive.check_constraints()
             if reasonable:
@@ -291,7 +287,7 @@ class Grasp(PhysicalAction):
     def check_object_constraints(self):
         if self.object == None:
             return True
-        print("called object constraint")
+        log.debug("called object constraint")
         anchor_point = get_graspable(self.object, self.verbose)
         if anchor_point != None:
             self.add_object_support(self.object, anchor_point, GRASP) 
@@ -384,7 +380,7 @@ class Ingest(PhysicalAction):
     def check_object_constraints(self):
         if self.object == None:
             return True
-        print("called object constraint")
+        log.debug("called object constraint")
         anchor_point = get_animate(self.object, self.verbose)
         if anchor_point != None: 
             self.add_object_support(self.object, anchor_point, "ingest")
@@ -456,7 +452,7 @@ class Wait(Move):
                         self.support.append("Although green means go, green also means yields to pedestiran in the road.")
                     self.support.append("Since there is a pedestrian in the road, waiting is reasonable.")
                     consistent = True
-        print("consistent is", consistent)
+        log.debug("Checked constraints: consistent is %s" %consistent)
         return consistent 
 
     def check_subject_constraints(self):

@@ -117,28 +117,23 @@ def is_ingest_verb(verb, verbose):
 def get_verb_type(base, subject, object, context, phrases, verbose=False):
     # Special case for vehicle primitives
     if 'car' in subject or 'vehicle' in subject:
-        if verbose:
-            print("checking for VEHICLE verb primitive.")
+        log.debug("checking for VEHICLE verb primitive.")
         if is_vehicle_move(base, verbose):
             return Go(subject, base, object, context, phrases, verbose)
         else:
             return Wait(subject, base, object, context, phrases, verbose)
     if is_ingest_verb(base, verbose):
-        if verbose:
-            print("INGEST verb primitive created.")
+        log.debug("INGEST verb primitive created.")
         return Ingest(subject, base, object, context, phrases, verbose)
 
     if is_communication_verb(base, verbose):
-        if verbose:
-            print("SPEAK verb primitive created.")
+        log.debug("SPEAK verb primitive created.")
         return Speak(subject, base, object, context, phrases, verbose)
     elif is_propel_verb(base, verbose):
-        if verbose:
-            print("PROPEL verb primitive created.")
+        log.debug("PROPEL verb primitive created.")
         return Propel(subject, base, object, context, phrases, verbose)
     elif is_action_verb(base, verbose):
-        if verbose:
-            print("MOVE verb primitive created.")
+        log.debug("MOVE verb primitive created.")
         return Move(subject, base, object, context, phrases, verbose)
     else:
         raise ValueError("don't know how to handle verb {0}".format(base))
