@@ -11,13 +11,14 @@
     <link rel="stylesheet" href="static/css/font-awesome.min.css">
 
 
-    <title>Hello, world!</title>
+    <title>Reasonableness of Image Captions</title>
   </head>
   <body>
 
     <div class="container">
         <h1>Reasonableness of Vehicle Actions</h1>
 
+        <form id="image_form" action="#">
         <div class="row mb-3">
             <div class="col-md-12">
                 <div class="media">
@@ -25,20 +26,97 @@
                         <img src="static/img/car_at_red.jpg" style="width:100%;height:100%" />
                     </div>
                     <div class="media-body">
+                      <div class="row">
+                          <div class="col-md-4 mb-2">
+                              <div class="card">
+                                <div class="card-header pt-2 pb-2">
+                                  Vehicle Perception
+                                </div>
+                                <div class="card-body">
+                                  <div class="row">
+                                    <div class="col-md-6">
+                                      <div class="form-check">
+                                        <input class="form-check-input" type="radio" name="lightColor" id="lightColorRed" value="option1">
+                                        <label class="form-check-label" for="lightColorRed">Red</label>
+                                      </div>
+                                      <div class="form-check">
+                                        <input class="form-check-input" type="radio" name="lightColor" id="lightColorYellow" value="option2">
+                                        <label class="form-check-label" for="lightColorYellow">Yellow</label>
+                                      </div>
+                                      <div class="form-check">
+                                        <input class="form-check-input" type="radio" name="lightColor" id="lightColorGreen" value="option3">
+                                        <label class="form-check-label" for="lightColorGreen">Green</label>
+                                      </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                      <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" name="pedestrian" id="pedestrianCheck" value="option1">
+                                        <label class="form-check-label" for="pedestrianCheck">Pedestrian</label>
+                                      </div>
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+                          </div>
+                          <div class="col-md-4 mb-2">
+                              <div class="card">
+                                <div class="card-header pt-2 pb-2">
+                                  Driving Tactics
+                                </div>
+                                <div class="card-body">
+                                  <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="intent" id="intentWait" value="option1">
+                                    <label class="form-check-label" for="intentWait">Wait</label>
+                                  </div>
+                                  <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="intent" id="intentGoForward" value="option2">
+                                    <label class="form-check-label" for="intentGoForward">Go forward</label>
+                                  </div>
+                                  <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="intent" id="intentGoRight" value="option3">
+                                    <label class="form-check-label" for="intentGoRight">Go right</label>
+                                  </div>
+                                </div>
+                              </div>
+                          </div>
+                          <div class="col-md-4 mb-2">
+                              <div class="card">
+                                <div class="card-header pt-2 pb-2">
+                                  Vehicle State
+                                </div>
+                                <div class="card-body">
+                                  <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="vehicleState" id="vehicleStateStopped" value="option1">
+                                    <label class="form-check-label" for="inlineRadio1">Stopped</label>
+                                  </div>
+                                  <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="vehicleState" id="vehicleStateSlow" value="option2">
+                                    <label class="form-check-label" for="inlineRadio2">Moving slowly</label>
+                                  </div>
+                                  <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="vehicleState" id="vehicleStateFast" value="option3">
+                                    <label class="form-check-label" for="inlineRadio3">Moving quickly</label>
+                                  </div>
+                                </div>
+                              </div>
+                          </div>
+                      </div>
                         <div class="row">
                             <div class="col-md-3">
-                                <button class="form-control" id="generate_button">Generate Description</button>
+                                <input type="submit" class="form-control" id="generate_button" value="Generate Description">
+                                <span id="captioning_badge" class="fa fa-fw fa-2x fa-cog fa-spin"></span>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
+        </form>
 
 
         <div class="row mb-3">
             <div class="col-md-12">
-                <input id="caption_container" class="form-control" placeholder="Some caption..." />
+                <input id="caption_container" class="form-control" placeholder="Some caption..."/>
             </div>
         </div>
 
@@ -69,14 +147,83 @@
     <script type="text/javascript">
 
     $('#loading_badge').hide();
+    $('#captioning_badge').hide();
     $('#reasonable_badge').hide();
     $('#unreasonable_badge').hide();
 
-    $('#generate_button').click(function(e){
+    var f1 = function(e){
       e.preventDefault();
-      $('#caption_container').val('The vehicle waits at a red light');
-    })
+      $('#reasonable_badge').hide();
+      $('#unreasonable_badge').hide();
+      $('#log').val('');
+      $('#captioning_badge').show();
+      window.setTimeout(function(){
+        $('#captioning_badge').hide();
+        $('#caption_container').val('The vehicle waits at a red light');
+      }, 1000);
 
+
+    };
+/*
+    var f2 = function(e){
+      e.preventDefault();
+      $('#reasonable_badge').hide();
+      $('#unreasonable_badge').hide();
+      $('#log').val('');
+      $('#captioning_badge').show();
+      window.setTimeout(function(){
+        $('#captioning_badge').hide();
+        $('#caption_container').val('a mailbox crossing the street in a hurricane');
+      }, 1000);
+
+    };
+
+    var f3 = function(e){
+      e.preventDefault();
+      $('#reasonable_badge').hide();
+      $('#unreasonable_badge').hide();
+      $('#log').val('');
+      $('#captioning_badge').show();
+      window.setTimeout(function(){
+        $('#captioning_badge').hide();
+        $('#caption_container').val('a penguin crossing the street with penguins');
+      }, 1000);
+    };
+*/
+    $('#image_form').submit(f1);
+/*
+    var g2 = function(e){
+      e.preventDefault();
+      $('#reasonable_badge').hide();
+      $('#unreasonable_badge').hide();
+      $('#log').val('');
+      $('#the_image').attr('src', 'static/img/penguins_walking.jpg');
+      $('#image_container').off('click').click(g3);
+      $('#image_form').off('submit').submit(f3);
+    };
+
+    var g1 = function(e){
+      e.preventDefault();
+      $('#reasonable_badge').hide();
+      $('#unreasonable_badge').hide();
+      $('#log').val('');
+      $('#the_image').attr('src', 'static/img/mailbox_cross_street.jpeg');
+      $('#image_container').off('click').click(g2);
+      $('#image_form').off('submit').submit(f2);
+    };
+
+    var g3 = function(e){
+      e.preventDefault();
+      $('#reasonable_badge').hide();
+      $('#unreasonable_badge').hide();
+      $('#log').val('');
+      $('#the_image').attr('src', 'static/img/mailbox_cross_street.jpeg');
+      $('#image_container').off('click').click(g1);
+      $('#image_form').off('submit').submit(f1);
+    };
+
+    $('#image_container').click(g1);
+*/
     $('#evaluate_button').click(function(e){
       e.preventDefault();
 
@@ -126,6 +273,51 @@
           $('#log').val(t);
         },
       })
+    })
+
+    $('#image_upload').change(function(e){
+      if (this.files && this.files[0]) {
+          var reader = new FileReader();
+
+          reader.onload = function (e) {
+              $('#the_image').attr('src', e.target.result);
+          };
+
+          reader.readAsDataURL(this.files[0]);
+
+          $('#image_container').off('click');
+
+          $('#image_form').off('submit').submit(function(e){
+            e.preventDefault();
+            // $('#caption_container').val('a mailbox crossing the street');
+
+            $('#reasonable_badge').hide();
+            $('#unreasonable_badge').hide();
+            $('#caption_container').val('');
+            $('#log').val('');
+
+            $('#captioning_badge').show();
+
+            $.post({
+              url: '/api/1/caption',
+              data: new FormData(this),
+              processData: false,
+              contentType: false,
+              success: function(data, textStatus, jqXHR){
+                $('#captioning_badge').hide();
+
+                $('#caption_container').val(data.caption);
+              },
+              error: function(jqxhr, textStatus, errorThrown){
+                $('#captioning_badge').hide();
+
+                let t = `Error trying to evaluate: ${textStatus}\n\n${errorThrown}`;
+                $('#caption_container').val(t);
+              },
+            })
+
+          })
+      }
     })
 
     </script>

@@ -35,7 +35,7 @@ def get_atis_tree(words):
 
 def make_string_grammar(words):
     tags =nltk.pos_tag(words)
-    print(tags)
+    log.debug(tags)
     base = """
 S -> NP VP
 VP -> V NP | V NP PP
@@ -78,7 +78,7 @@ def parse_with_regex(words):
     VP: {<V V*|V P V> <NP|PP>*}  # VP -> V (NP|PP)*
     ''')
     result = parser.parse(tags)
-    result.draw()
+    #result.draw()
     #log.debug(result.draw())
     return result
 
@@ -146,8 +146,7 @@ def get_verbs(tree, verbose=False):
                 else:
                     phrases['preposition'] = [phrase.strip()]
     if context:
-        if verbose:
-            print("  Context is %s" % phrases)
+        log.debug("  Context is %s" % phrases)
     return (base_verb, verb_object, context, phrases)
 
 def filter_noun(tree):
@@ -190,26 +189,20 @@ def test_again(tokens):
                 print("| \"" + word + "\"")
         print('')
 
+
 # TODO - Need verbose
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('sentence', nargs='+',
                     help='Sentence')
-    parser.add_argument("-d", "--debug", action='store_true',
-                        help='print debug messages to stderr')
     parser.add_argument("-v", "--verbose", action='store_true',
                         help='This is the same as debug right now')
     args = parser.parse_args()
 
-
-    if args.debug:
-        log.basicConfig(format="%(levelname)s: %(message)s",
+    if args.verbose:
+        log.basicConfig(stream=sys.stdout, format="%(levelname)s: %(message)s",
                         level=log.DEBUG)
         log.info("Verbose output.")
-    else:
-        log.basicConfig(format="%(levelname)s: %(message)s")
-    if args.verbose:
-        print("INFO: Verbose OUTPUT\n")
 
     tree = parse_with_regex(args.sentence)
     (noun, noun_phrase) = get_noun_phrase(tree)

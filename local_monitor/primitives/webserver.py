@@ -1,6 +1,7 @@
 
 import requests
 import sys
+import os
 import itertools
 import logging as log # Suggestion from stackoverflow
 import operator
@@ -16,6 +17,14 @@ from .representation import *
 
 from flask import Flask, request, json, render_template
 app = Flask(__name__)
+
+from werkzeug.utils import secure_filename
+
+import subprocess
+
+RUN_INFERENCE = "/REPLACE/WITH/im2txt/bazel-bin/im2txt/run_inference"
+CHECKPOINT = "/REPLACE/WITH/im2txt/model.ckpt-20000"
+WORD_COUNTS = "/REPLACE/WITH/im2txt/word_counts.txt"
 
 @app.route("/")
 def index():
@@ -43,3 +52,31 @@ def evaluate():
     act.check_constraints()
 
     return app.make_response(json.jsonify(act.summary_info()))
+
+@app.route("/api/1/caption", methods=['POST'])
+def caption():
+    if 'file' not in request.files:
+        r = app.make_response(json.jsonify({'error': "no file provided"}))
+        r.status_code = 400
+        return r
+
+    the_file = request.files['file']
+    if the_file.filename == '':
+        r = app.make_response(json.jsonify({'error': "no file provided"}))
+        r.status_code = 400
+        return r
+
+    fn = secure_filename(the_file.filename)
+    path = os.path.join("/tmp/", fn)
+    the_file.save(path)
+
+    caption_info = subprocess.check_output([RUN_INFERENCE, \
+    "--checkpoint_path={0}".format(CHECKPOINT), \
+    "--vocab_file={0}".format(WORD_COUNTS), \
+    "--input_files={0}".format(path)])
+
+    caption_info = caption_info.decode().split('\n')
+
+    caption = caption_info[1].split(')')[1].split('(')[0].strip()
+
+    return app.make_response(json.jsonify({'caption': caption}))
