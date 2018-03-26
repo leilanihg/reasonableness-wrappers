@@ -54,9 +54,10 @@ def evaluate():
 
     # get verb type
     act = get_verb_type(verb, noun, object, context, phrase_dict, False)
-    act.check_constraints()
+    consistent = act.check_constraints()
 
     resp = act.summary_info()
+    resp['reasonable'] = resp['reasonable'] or consistent
     resp['log_data'] = log_data.getvalue()
 
     return app.make_response(json.jsonify(resp))
