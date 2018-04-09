@@ -103,7 +103,6 @@
                       </div>
                         <div class="row">
                             <div class="col-md-3">
-                                <input type="submit" class="form-control" id="generate_button" value="Generate Description">
                                 <span id="captioning_badge" class="fa fa-fw fa-2x fa-cog fa-spin"></span>
                             </div>
                         </div>
@@ -116,7 +115,7 @@
 
         <div class="row mb-3">
             <div class="col-md-12">
-                <input id="caption_container" class="form-control" placeholder="Some caption..."/>
+                <input id="caption_container" class="form-control" placeholder="Some caption..." value="The vehicle waits at a red light"/>
             </div>
         </div>
 
@@ -152,7 +151,7 @@
     $('#unreasonable_badge').hide();
 
     var f1 = function(e){
-      e.preventDefault();
+      //e.preventDefault();
       $('#reasonable_badge').hide();
       $('#unreasonable_badge').hide();
       $('#log').val('');
@@ -171,10 +170,12 @@
         }
 
         $('#caption_container').val(`The vehicle ${intent} at a ${lightColor} light${pedestrian}`);
-      }, 1000);
+      }, 0);
 
 
     };
+
+    $('#image_form input').click(f1);
 /*
     var f2 = function(e){
       e.preventDefault();
@@ -201,7 +202,7 @@
       }, 1000);
     };
 */
-    $('#image_form').submit(f1);
+    //$('#image_form').submit(f1);
 /*
     var g2 = function(e){
       e.preventDefault();
