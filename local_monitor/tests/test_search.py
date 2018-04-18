@@ -1,6 +1,25 @@
 import unittest
 from .test import *
 from ..conceptnet.search import *
+#from ..primitives.search import *
+
+class TestGetHops(unittest.TestCase):
+    def runTest(self):
+        print("trying to get hops")
+        self.assertEqual(get_hops('penguin', 'animal'), 1)
+        #self.assertEqual(get_hops('cactus', 'animal'), 0)
+        
+        #self.assertEqual(get_hops('cactus', 'plant'), 0)
+        #self.assertEqual(get_hops('dinosaur', 'plant'), 0)
+
+        #self.assertEqual(get_hops('chair', 'object'), 0)
+        #self.assertEqual(get_hops('snow', 'object'), 0)
+
+        #self.assertEqual(get_hops('san francisco', 'city'), 0)
+
+        #self.assertEqual(get_hops('Maine', 'place'), 0)
+        #self.assertEqual(get_hops('house', 'place'), 0)
+        #self.assertEqual(get_hops('boy', 'place'), 0)
 
 class TestHasIsAEdge(unittest.TestCase):
     def runTest(self):
@@ -73,5 +92,6 @@ class TestFindIsAPath(unittest.TestCase):
                          None)
 
 
-#if __name__ == '__main__':
-#    unittest.main()
+if __name__ == '__main__':
+    print("Is this main being called?")
+    unittest.main()
