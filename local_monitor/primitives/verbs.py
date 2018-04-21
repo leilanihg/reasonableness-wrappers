@@ -105,7 +105,7 @@ def is_communication_verb(verb,verbose):
 
 # kick hit
 def is_propel_verb(verb, verbose):
-    return has_any_edge(verb, 'hit', verbose)
+    return has_any_edge(verb, 'hit', verbose) or has_any_edge(verb, 'push', verbose) or has_any_edge(verb, 'propel', verbose)
 
 def is_ingest_verb(verb, verbose):
     if has_any_edge(verb, 'eat', verbose) or has_any_edge(verb, 'ingest', verbose):
@@ -120,7 +120,6 @@ def get_verb_type(base, subject, object, context, phrases, verbose=False):
         if verbose:
             print("INGEST verb primitive created.")
         return ingest.Ingest(subject, base, object, context, phrases, verbose)
-
     if is_communication_verb(base, verbose):
         if verbose:
             print("SPEAK verb primitive created.")

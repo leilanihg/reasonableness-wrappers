@@ -1,5 +1,7 @@
+# Check how anchor points match
+
 import unittest
-from ..primitives.anchors import *
+from .anchors import *
 
 class TestFindAnchorPoint(unittest.TestCase):
     def runTest(self):

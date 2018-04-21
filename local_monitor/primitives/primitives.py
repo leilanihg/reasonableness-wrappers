@@ -21,6 +21,7 @@ class ACT:
         self.subject = self.clean_name(subject)
         self.verb = verb
         self.object = self.clean_name(object)
+        self.subject_anchor = None
         #self.subject_phrase = subject_phrase
         self.context = context
         self.phrases = phrases

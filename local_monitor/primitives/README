@@ -7,9 +7,12 @@ machine.
 Command-line
 ============
 Run from the PARENT directory:
-python3 -m primitives.representation a mailbox crossing the street
-python3 -m primitives.representation a mailman crossing the street
+python3 -m primitives.main a mailbox crossing the street
+python3 -m primitives.main a mailman crossing the street
 
 For verbose output:
-python3 -m primitives.representation -v a mailbox crossing the street
-python3 -m primitives.representation -v a mailman crossing the street
+python3 -m primitives.main -v a mailbox crossing the street
+python3 -m primitives.main -v a mailman crossing the street
+
+
+Tests folder is kind of broken <- use tests in primitives

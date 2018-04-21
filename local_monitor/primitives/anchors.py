@@ -26,7 +26,7 @@ def is_confusion(item):
     else: return False
 
 def is_weather(item):
-    weather = ['hurricane', 'storm', 'earthquake']
+    weather = ['weather', 'hurricane', 'storm', 'earthquake', 'wind', 'rain']
     if item in weather:
         return True
     else: return False
@@ -37,15 +37,6 @@ def is_weather(item):
 # If it is ingestible, returns specific anchor point
 # Otherwise returns false
 # TODO a lot of these don't share edges with the anchor points!
-def get_ingestible(object, verbose=False):
-    # TODO Can try to populate this list with ConceptNet
-    # TODO make conceptnet search to add "an animal, the animal", etc to the search
-    ingestible = ['animal', 'plant', 'food', 'liquid']
-    for item in ingestible:
-        if has_IsA_edge(object, item, verbose):
-            return item
-    return None
-    # TODO House has edge with one of these. 
 
 # If it is a thing, returns specific anchor point
 # Otherwise returns false
@@ -72,6 +63,7 @@ def get_propel(object, verbose=False):
         if has_IsA_edge(object, item, verbose):
             return item
     return None
+
 
 def check_vehicle_constraints(context_phrases, support, violations):
     if context_phrases:

@@ -1,6 +1,12 @@
 # TODO - Need verbose
 from .representation import * 
 
+def test_main(subject, verb, object=None, context=[], phrase_dict=[]):
+    # get verb type
+    act = get_verb_type(verb, subject, object, context, phrase_dict, False)
+    consistent = act.check_constraints()
+    return consistent
+
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('sentence', nargs='+',
@@ -21,6 +27,7 @@ def main():
     if args.verbose:
         print("INFO: Verbose OUTPUT\n")
 
+    print("args", args.sentence)
     tree = parse_with_regex(args.sentence)
     (noun, noun_phrase) = get_noun_phrase(tree)
     (verb, object, context, phrase_dict) = get_verbs(tree, args.verbose)
@@ -31,5 +38,7 @@ def main():
     act = get_verb_type(verb, noun, object, context, phrase_dict, args.verbose)
     consistent = act.check_constraints()
     act.print_summary(consistent)
+    return consistent
+
 if __name__ == "__main__":
     main()
