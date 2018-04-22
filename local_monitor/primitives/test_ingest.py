@@ -56,7 +56,7 @@ class TestIngestPlantPass(unittest.TestCase):
         object_sentence = test_main("tree", "ingest", "water", ["hurricane"])
         self.assertTrue(object_sentence, "tree can ingest water in a hurricane")
         object_sentence_2 = test_main("flower", "ingests", "plant food", ["hurricane"])
-        self.assertTrue(no_object, "flower can ingest plant food")
+        self.assertTrue(object_sentence_2, "flower can ingest plant food")
 
 class TestIngestPlantFail(unittest.TestCase):
     def runTest(self):
