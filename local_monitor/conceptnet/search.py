@@ -1,93 +1,58 @@
 import requests
 import logging as log
+import queue
 
 query_prefix = 'http://api.conceptnet.io/c/en/'
+isA_search = '?rel=/r/IsA&limit=1000'
 limit = 20
-MAX_DEPTH = 5
+MAX_DEPTH = 3
+
+# TODO - this should exist elsewhere
+subject_anchors = ['animal', 'object', 'place', 'plant']
+verb_anchor = ['move', 'propel']
 
 # Counts the amount of IsA hops from a start to an anchor point
 # This should be a shortest path algorithm
-def get_hops(start, anchor, depth=0):
-    if(has_IsA_edge(start, anchor)):
-        return 1
-    else:
-        # get all IsA relations from start -> a 
-        search = clean_search(start)
-        log.debug("Now hooping through the IsA hiearchy for %s %s"%(search, anchor))
-        obj = requests.get(query_prefix+search+'?rel=/r/IsA&limit=1000').json()
-        edges = obj['edges']
-        for edge in edges:
-            from_node = clean_search(edge['start']['label'])
-            to_node = clean_search(edge['end']['label'])
-            rel = edge['rel']['label']
-            # May need more processing
-            if(search_equals(from_node, search) and rel == 'IsA'): # make sure its the right way
-                return get_hops(from_node, anchor, depth+1) + 1
+def get_shortest_hops(start, relation='IsA'):
+    shortest = None
+    target = None
+    for anchor in subject_anchors: # Will want to toggle for verb
+        candidate = find_shortest_path(start, anchor, relation)
+        try:
+            if candidate and not shortest or len(candidate) < len(shortest):
+                shortest = candidate
+                target = anchor
+        except TypeError:
+            continue
+    return (target, shortest)
 
-# TODO change from finding IsA path to any relation path
-# Check with how this can work with ConceptNet
-def find_IsA_path(start, end, path=None, queue=None, seen=None):
-    if path is None:
+# Finds the shortest path for a specificed relation
+def find_shortest_path(start, anchor, relation='IsA', path=None):
+    if path==None:
         path = []
-        path.append(clean_search(start))
-
-    if queue is None:
-        queue = []
-
-    if seen is None:
-        seen = []
-        
+    path = path + [start]
+    if has_IsA_edge(start, anchor):
+        return path + [anchor]
+    if len(path) >= MAX_DEPTH:
+        return None
+    shortest = None
     search = clean_search(start)
-    log.debug("Now searching through the IsA hiearchy for %s %s"%(search, path))
-    log.debug("We've seen %s"% seen)
-    obj = requests.get(query_prefix+search+'?rel=/r/IsA&limit=1000').json()
+    obj = requests.get(query_prefix+search+isA_search).json()
     edges = obj['edges']
     
-    if(has_IsA_edge(start,end)):
-        log.debug("Found an edge between %s and %s" %(start,end))
-        path.append(end)
-        return path
-    else:
-        new_queue = []
-        if(start not in seen): # Might need more preprocessing
-            for edge in edges:
-                from_node = clean_search(edge['start']['label'])
-                to_node = clean_search(edge['end']['label'])
-                rel = edge['rel']['label']
-                # May need more processing
-                if(search_equals(from_node, search) and rel == 'IsA'): # make sure its the right way
-                    node = (to_node, len(path))
-                    if node not in queue and node not in new_queue and \
-                            not search_equals(node[0], start):
-                        new_queue.append(node)
-                        if len(new_queue) >=10:
-                            break
-            seen.append(start)
-        merged_queue = []
-        merged_queue.extend(new_queue)
-        merged_queue.extend(queue)
-        log.debug("new queue is %s" %merged_queue)
-        if merged_queue:
-            node = merged_queue.pop(0)[0]
-            if node not in path:
-                if(len(path) < limit-1 ):
-                    log.debug("recursing with %s" %node)
-                    path.append(node)
-                    newpath = find_IsA_path(node, end, path, merged_queue, seen)
-                    return newpath
-                else: # we've gone too far
-                    if not (containsConcept(end, merged_queue)):
-                        log.debug("We've gone too far")
-                        path.pop()
-                        node=path[-1]
-                        newpath = find_IsA_path(node, end, path, 
-                                                [(x,y) for (x,y) in merged_queue if y != 2],
-                                                seen)
-                        return newpath
-                    else: 
-                        path.append(end)
-                        return path
-    return None
+    for edge in edges:
+        from_node = clean_search(edge['start']['label'])
+        to_node = clean_search(edge['end']['label'])
+        rel = edge['rel']['label']
+        
+        # May need more processing
+        if(search_equals(from_node, search) and rel == relation):
+            if to_node not in path:
+                newpath = find_shortest_path(to_node, anchor, relation, path)
+                if newpath:
+                    if not shortest or len(newpath) < len(shortest):
+                        shortest = newpath
+    return shortest
 
 def search_equals(string1, string2):
     if(clean_search(string1) == clean_search(string2)):
@@ -122,6 +87,7 @@ def has_any_edge(word, verb_primitive, verbose=False):
         return False
 
 # First check if there is a direct connection via an IsA relation
+# TODO - This needs to be rigorously checked
 def has_IsA_edge(word, concept, verbose=False):
     word_text = word.replace(" ", "_").lower()
 
