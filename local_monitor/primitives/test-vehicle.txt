@@ -1,0 +1,101 @@
+Example 1: Greeen light
+Scenario : one-lane road, green light, no obstacles
+=========================================================================
+Assessment of "go": REASONABLE
+=========================================================================
+python3 -m primitives.representation -v The vehicle waits at a green light
+
+This perception is unreasonable
+=============================================
+A green light means go, which is inconsistent with waiting.
+So it is unreasonable for the vehicle to wait
+
+
+=========================================================================
+Assessment of "wait": UNREASONABLE
+=========================================================================
+python3 -m primitives.representation -v The vehicle moves at a green light
+
+This perception is reasonable
+=============================================
+Green means go
+So it is reasonable for the vehicle to move
+
+Example 2: Green light with obstruction
+Scenario: One-lane road, green light, pedstrian in crosswalk
+
+
+=========================================================================
+Assessment of "go": UNREASONABLE
+=========================================================================
+python3 -m primitives.representation -v The vehicle moves at a green light
+with a pedestrian
+
+This perception is unreasonable
+=============================================
+Although green means go, green also means yields to pedestrian in the road.
+Since there is a pedestrian in the road, move is unreasonable.
+So it is unreasonable for the vehicle to move
+
+=========================================================================
+Assessment of "wait": REASONABLE
+=========================================================================
+python3 -m primitives.representation -v The vehicle waits at a green light
+with a pedestrian
+
+This perception is reasonable
+=============================================
+Although green means go, green also means yields to pedestrian in the road.
+Since there is a pedestrian in the road, waiting is reasonable.
+So it is reasonable for the vehicle to wait
+
+Example 5: Yellow Light
+Scenario: One-lane road, yellow light, no obstacles, physics says safe to stop
+
+=========================================================================
+Assessment of "go": UNREASONABLE
+=========================================================================
+python3 -m primitives.representation -v The vehicle moves at a yellow light
+
+This perception is unreasonable
+=============================================
+A yellow light means 'stop if safe', which is inconsistent with go.
+So it is unreasonable for the vehicle to move
+This perception is unreasonable
+
+=========================================================================
+Assessment of "wait": REASONABLE
+=========================================================================
+python3 -m primitives.representation -v The vehicle waits at a yellow light
+
+This perception is reasonable
+=============================================
+A yellow light means 'stop if safe'.  So waiting is reasonable
+So it is reasonable for the vehicle to wait
+
+
+Scenario: One-lane road, yellow light, no obstacles, physics says safe to stop
+
+=========================================================================
+Assessment of "go": UNREASONABLE
+=========================================================================
+python3 -m primitives.representation -v The vehicle moves at a yellow light
+
+This perception is unreasonable
+=============================================
+A yellow light means 'stop if safe', which is inconsistent with go.
+Since there is a pedestrian in the road, move is unreasonable.
+So it is unreasonable for the vehicle to move
+This perception is unreasonable
+
+=========================================================================
+Assessment of "wait": REASONABLE
+=========================================================================
+python3 -m primitives.representation -v The vehicle waits at a yellow light
+
+This perception is reasonable
+=============================================
+A yellow light means 'stop if safe'.  So waiting is reasonable
+Since there is a pedestrian in the road, waiting is reasonable.
+So it is reasonable for the vehicle to wait
+This perception is reasonable

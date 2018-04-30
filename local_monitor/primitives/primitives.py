@@ -417,6 +417,7 @@ class Go(Move):
                     consistent = False
                 elif 'yellow light' in context:
                     self.light = 'yellow'
+                    self.violations.append("Without additional physics data indiciating its safer to go,") 
                     self.violations.append("A yellow light means 'stop if safe', which is inconsistent with go.")
                     consistent = False
                 if 'pedestrian' in context:
