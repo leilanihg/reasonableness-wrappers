@@ -1,0 +1,24 @@
+Web
+===
+Run run.sh and go to http://localhost:5000 from a Web browser on the same
+machine.
+
+
+Command-line
+============
+Run from the PARENT directory:
+python3 -m primitives.main a mailbox crossing the street
+python3 -m primitives.main a mailman crossing the street
+
+For verbose output:
+python3 -m primitives.main -v a mailbox crossing the street
+python3 -m primitives.main -v a mailman crossing the street
+
+
+To run ConceptNet tests:
+Run from the PARENT directory (tests):
+python3 -m test_conceptnet.test.py
+
+To run reasonability tests:
+Run from the PARENT directory (reasonableness):
+python 3 -m local_monitor.tests.test_physical_actions.test
