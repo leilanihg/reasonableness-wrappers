@@ -1,9 +1,0 @@
-import unittest
-from .test import *
-from ..primitives.primitives import *
-
-class TestVerbPrimitive(unittest.TestCase):
-    testObject = Move("Ben", "Sally")
-    def runTest(self):
-        self.assertEqual(True, True)
-        self.assertEquals(testObject.summary(), "Ben moves Sally")

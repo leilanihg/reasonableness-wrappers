@@ -1,9 +1,7 @@
 import unittest
-from .test_anchors import *
-from .test_explain import *
-from .test_premise import *
-from .test_search import *
-from .test_verbs import *
+from .test_physical_actions import *
+from .test_conceptnet import *
+
 
 def ignore_warnings(test_func):
     def do_test(self, *args, **kwargs):

@@ -16,8 +16,8 @@ python3 -m primitives.main -v a mailman crossing the street
 
 
 To run ConceptNet tests:
-Run from the PARENT directory (tests):
-python3 -m test_conceptnet.test.py
+Run from the PARENT directory (reasonableness):
+python3 -m local_monitor.tests.test_conceptnet.test
 
 To run reasonability tests:
 Run from the PARENT directory (reasonableness):
