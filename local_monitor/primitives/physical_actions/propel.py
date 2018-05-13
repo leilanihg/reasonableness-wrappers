@@ -42,7 +42,7 @@ class Propel(PhysicalAction):
         if self.object == None:
             return True
         if not is_weather(self.object): 
-            self.add_object_support(self.object, 'item', PROPEL)
+            self.add_object_support(self.object, 'item', "propel")
             return True
         else:
             violation = "A %s cannot be propeled" %(self.object)
@@ -53,8 +53,8 @@ class Propel(PhysicalAction):
         if self.context == None:
             return False
 
-        self.support = []
-        self.violations = []
+        # self.support = []
+        # self.violations = []
 
         for context in self.context:
             if is_weather(context):

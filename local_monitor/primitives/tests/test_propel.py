@@ -1,5 +1,5 @@
 import unittest
-from .main import *
+from ..main import *
 
 class TestPropelVehiclePass(unittest.TestCase):
     def runTest(self):

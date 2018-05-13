@@ -15,4 +15,10 @@ python3 -m primitives.main -v a mailbox crossing the street
 python3 -m primitives.main -v a mailman crossing the street
 
 
-Tests folder is kind of broken <- use tests in primitives
+To run ConceptNet tests:
+Run from the PARENT directory (local_monitor):
+python3 -m tests.test.py
+
+To run reasonability tests:
+Run from the PARENT directory (local_monitor):
+python 3 -m primitives.test.test.py

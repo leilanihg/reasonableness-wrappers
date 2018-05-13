@@ -1,5 +1,5 @@
 import unittest
-from .main import *
+from ..main import *
 
 # TODO most of these will not pass
 class TestExpelVehiclePass(unittest.TestCase):
