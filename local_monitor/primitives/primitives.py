@@ -418,12 +418,13 @@ class Go(Move):
                     consistent = False
                 elif 'yellow light' in context:
                     self.light = 'yellow'
-                    if 'quickly' in self.descriptors:
-                        self.support.append("Approaching %s means it's safer to go,"%self.descriptors[0])
-                        consistent = True
-                    elif 'slowly' or 'stopped' in self.descriptors:
-                        self.violations.append("Approaching %s means it's safe to stop,"%self.descriptors[0])
-                        consistent = False
+                    if self.descriptors:
+                        if 'quickly' in self.descriptors:
+                            self.support.append("Approaching %s means it's safer to go,"%self.descriptors[0])
+                            consistent = True
+                        elif 'slowly' or 'stopped' in self.descriptors:
+                            self.violations.append("Approaching %s means it's safe to stop,"%self.descriptors[0])
+                            consistent = False
                     else:    
                         self.violations.append("Without additional physics data indiciating its safer to go,") 
                         self.violations.append("A yellow light means 'stop if safe', which is inconsistent with go.")
@@ -454,12 +455,13 @@ class Wait(Move):
                     consistent = True
                 elif 'yellow light' in context:
                     self.light = 'yellow'
-                    if 'quickly' in self.descriptors:
-                        self.violations.append("Approaching %s means it's not safe to stop,"%self.descriptors[0])
-                        consistent = False
-                    elif 'slowly' or 'stopped' in self.descriptors:
-                        self.support.append("Approaching %s means it's safe to stop,"%self.descriptors[0])
-                        consistent = True
+                    if self.descriptors:
+                        if 'quickly' in self.descriptors:
+                            self.violations.append("Approaching %s means it's not safe to stop,"%self.descriptors[0])
+                            consistent = False
+                        elif 'slowly' or 'stopped' in self.descriptors:
+                            self.support.append("Approaching %s means it's safe to stop,"%self.descriptors[0])
+                            consistent = True
                     else:    
                         self.support.append("A yellow light means 'stop if safe'.  So waiting is reasonable")
                         consistent = True
