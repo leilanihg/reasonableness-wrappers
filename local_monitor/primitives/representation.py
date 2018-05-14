@@ -95,14 +95,17 @@ def check_tags(tags):
 # Will also need to get "REAL" Noun as NN/Etc....
 def get_noun_phrase(tree):
     phrase = ''
+    descriptors = ''
     for subtree in tree.subtrees(filter = filter_noun):
         for (name, label) in subtree:
             if label.startswith('N') or label.startswith('PRP'):
                 noun = name
+            elif label.startswith('J'):
+                descriptors = name
             phrase += name
             phrase += ' '
         # Assume it's the first noun
-        return (noun, phrase.strip())
+        return (noun, phrase.strip(), descriptors)
 
 #
 def get_verbs(tree, verbose=False):
@@ -212,8 +215,13 @@ def main():
         log.info("Verbose output.")
 
     tree = parse_with_regex(args.sentence)
-    (noun, noun_phrase) = get_noun_phrase(tree)
+    (noun, noun_phrase, adjectives) = get_noun_phrase(tree)
     (verb, object, context, phrase_dict) = get_verbs(tree, args.verbose)
+    if not adjectives == '':
+        if 'adverb' in phrase_dict:
+            phrase_dict['adverb'].append(adjectives)
+        else:
+            phrase_dict['adverb'] = [adjectives.strip()]
     phrase_dict['noun'] = noun_phrase
     #long_context = phrase_dict['preposition'] 
 
