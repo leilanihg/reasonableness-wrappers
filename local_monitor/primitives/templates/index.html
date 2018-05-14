@@ -11,7 +11,7 @@
     <link rel="stylesheet" href="static/css/font-awesome.min.css">
 
 
-    <title>Reasonableness of Image Captions</title>
+    <title>Reasonableness of Vehicle Actions</title>
   </head>
   <body>
 
@@ -65,15 +65,15 @@
                                 </div>
                                 <div class="card-body">
                                   <div class="form-check">
-                                    <input class="form-check-input" type="radio" name="intent" id="intentWait" value="waits" checked>
+                                    <input class="form-check-input" type="radio" name="intent" id="intentWait" value="wait" checked>
                                     <label class="form-check-label" for="intentWait">Wait</label>
                                   </div>
                                   <div class="form-check">
-                                    <input class="form-check-input" type="radio" name="intent" id="intentGoForward" value="goes">
+                                    <input class="form-check-input" type="radio" name="intent" id="intentGoForward" value="move">
                                     <label class="form-check-label" for="intentGoForward">Go forward</label>
                                   </div>
                                   <div class="form-check">
-                                    <input class="form-check-input" type="radio" name="intent" id="intentGoRight" value="turns">
+                                    <input class="form-check-input" type="radio" name="intent" id="intentGoRight" value="turn">
                                     <label class="form-check-label" for="intentGoRight">Go right</label>
                                   </div>
                                 </div>
@@ -86,15 +86,19 @@
                                 </div>
                                 <div class="card-body">
                                   <div class="form-check">
-                                    <input class="form-check-input" type="radio" name="vehicleState" id="vehicleStateStopped" value="option1" disabled>
+                                    <input class="form-check-input" type="radio" name="vehicleState" id="vehicleStateUnknown" value="" checked>
+                                    <label class="form-check-label" for="inlineRadio0">Unavailable</label>
+                                  </div>
+                                  <div class="form-check" style="display:none">
+                                    <input class="form-check-input" type="radio" name="vehicleState" id="vehicleStateStopped" value="waiting ">
                                     <label class="form-check-label" for="inlineRadio1">Stopped</label>
                                   </div>
                                   <div class="form-check">
-                                    <input class="form-check-input" type="radio" name="vehicleState" id="vehicleStateSlow" value="option2" disabled>
+                                    <input class="form-check-input" type="radio" name="vehicleState" id="vehicleStateSlow" value="going slowly ">
                                     <label class="form-check-label" for="inlineRadio2">Moving slowly</label>
                                   </div>
                                   <div class="form-check">
-                                    <input class="form-check-input" type="radio" name="vehicleState" id="vehicleStateFast" value="option3" disabled>
+                                    <input class="form-check-input" type="radio" name="vehicleState" id="vehicleStateFast" value="going quickly ">
                                     <label class="form-check-label" for="inlineRadio3">Moving quickly</label>
                                   </div>
                                 </div>
@@ -162,14 +166,22 @@
         let lightColor = document.getElementById('image_form').elements['lightColor'].value;
 
         let intent = document.getElementById('image_form').elements['intent'].value;
+        let state = document.getElementById('image_form').elements['vehicleState'].value;
 
         let pedestrian = '';
         if($('#pedestrianCheck').prop('checked'))
         {
-          pedestrian = ' with a pedestrian';
+          pedestrian = ' with a pedestrian in the way';
         }
 
-        $('#caption_container').val(`The vehicle ${intent} at a ${lightColor} light${pedestrian}`);
+        if($('#vehicleStateStopped').prop('checked'))
+        {
+          $('#caption_container').val(`The stationary vehicle decides to ${intent} at a ${lightColor} light${pedestrian}`);
+        }
+        else
+        {
+          $('#caption_container').val(`The vehicle ${state}decides to ${intent} at a ${lightColor} light${pedestrian}`);
+        }
       }, 0);
 
 
