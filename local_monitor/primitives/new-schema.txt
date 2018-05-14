@@ -141,3 +141,21 @@ This perception is reasonable
 =============================================
 A yellow light means 'stop if safe'.  So waiting is reasonable
 So it is reasonable for the vehicle to wait
+
+INPUT: The vehicle going quickly decides to go at a yellow light.
+This perception is reasonable
+=============================================
+Approaching quickly means it's safer to go,
+So it is reasonable for the vehicle to go
+
+INPUT: The vehicle going slowly decides to go at a yellow light.
+This perception is unreasonable
+=============================================
+Approaching slowly means it's safe to stop,
+So it is unreasonable for the vehicle to go
+
+INPUT: The vehicle going slowly decides to stop at a yellow light.
+This perception is reasonable
+=============================================
+Approaching slowly means it's safe to stop,
+So it is reasonable for the vehicle to stop
