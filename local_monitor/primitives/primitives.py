@@ -23,6 +23,7 @@ class ACT:
         #self.subject_phrase = subject_phrase
         self.context = context
         self.phrases = phrases
+        self.descriptors = phrases.get('adverb')
         self.support = []
         if 'preposition' in phrases:
             log.debug("Setting the prepositions")
@@ -417,9 +418,16 @@ class Go(Move):
                     consistent = False
                 elif 'yellow light' in context:
                     self.light = 'yellow'
-                    self.violations.append("Without additional physics data indiciating its safer to go,") 
-                    self.violations.append("A yellow light means 'stop if safe', which is inconsistent with go.")
-                    consistent = False
+                    if 'quickly' in self.descriptors:
+                        self.support.append("Approaching %s means it's safer to go,"%self.descriptors[0])
+                        consistent = True
+                    elif 'slowly' or 'stopped' in self.descriptors:
+                        self.violations.append("Approaching %s means it's safe to stop,"%self.descriptors[0])
+                        consistent = False
+                    else:    
+                        self.violations.append("Without additional physics data indiciating its safer to go,") 
+                        self.violations.append("A yellow light means 'stop if safe', which is inconsistent with go.")
+                        consistent = False
                 if 'pedestrian' in context:
                     if self.light is 'green':
                         self.violations.append("Although green means go, green also means yields to pedestrian in the road.")
@@ -446,8 +454,15 @@ class Wait(Move):
                     consistent = True
                 elif 'yellow light' in context:
                     self.light = 'yellow'
-                    self.support.append("A yellow light means 'stop if safe'.  So waiting is reasonable")
-                    consistent = True
+                    if 'quickly' in self.descriptors:
+                        self.violations.append("Approaching %s means it's not safe to stop,"%self.descriptors[0])
+                        consistent = False
+                    elif 'slowly' or 'stopped' in self.descriptors:
+                        self.support.append("Approaching %s means it's safe to stop,"%self.descriptors[0])
+                        consistent = True
+                    else:    
+                        self.support.append("A yellow light means 'stop if safe'.  So waiting is reasonable")
+                        consistent = True
                 if 'pedestrian' in context:
                     if self.light is 'green':
                         self.support.append("Although green means go, green also means yields to pedestrian in the road.")

@@ -30,7 +30,11 @@ def is_action_verb(verb, verbose):
         return True
     else: return False
 
-def is_vehicle_move(verb, verbose):
+def is_vehicle_move(verb, context, verbose):
+    print(context)
+    verbs = context.get('verb')
+    if 'decides' and 'stop' in verbs:
+        return False
     if(has_any_edge(verb, 'move', verbose)):
         return True
     elif 'move' in verb:
@@ -118,14 +122,13 @@ def get_verb_type(base, subject, object, context, phrases, verbose=False):
     # Special case for vehicle primitives
     if 'car' in subject or 'vehicle' in subject:
         log.debug("checking for VEHICLE verb primitive.")
-        if is_vehicle_move(base, verbose):
+        if is_vehicle_move(base, phrases, verbose):
             return Go(subject, base, object, context, phrases, verbose)
         else:
             return Wait(subject, base, object, context, phrases, verbose)
     if is_ingest_verb(base, verbose):
         log.debug("INGEST verb primitive created.")
         return Ingest(subject, base, object, context, phrases, verbose)
-
     if is_communication_verb(base, verbose):
         log.debug("SPEAK verb primitive created.")
         return Speak(subject, base, object, context, phrases, verbose)

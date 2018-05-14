@@ -145,15 +145,22 @@ def get_verbs(tree, verbose=False):
                     phrases['preposition'].append(phrase.strip())
                 else:
                     phrases['preposition'] = [phrase.strip()]
+    for subtree in tree.subtrees(filter = filter_adv):
+        for (adv, label) in subtree:
+            if 'adverb' in phrases:
+                phrases['adverb'].append(adv.strip())
+            else:
+                phrases['adverb'] = [adv.strip()]
     if context:
-        log.debug("  Context is %s" % phrases)
+        log.debug("  Phrases are %s" % phrases)
     return (base_verb, verb_object, context, phrases)
 
 def filter_noun(tree):
     return tree.label() == 'NP'
-
 def filter_verb(tree):
     return tree.label() == 'VP'
+def filter_adv(tree):
+    return tree.label() == 'Adv'
 
 # First is the noun phrase
 # Second is verb phrase?
