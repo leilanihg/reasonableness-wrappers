@@ -48,8 +48,13 @@ def evaluate():
         return r
 
     tree = parse_with_regex(req_data['caption'].split(' '))
-    (noun, noun_phrase) = get_noun_phrase(tree)
+    (noun, noun_phrase, adjectives) = get_noun_phrase(tree)
     (verb, object, context, phrase_dict) = get_verbs(tree)
+    if not adjectives == '':
+        if 'adverb' in phrase_dict:
+            phrase_dict['adverb'].append(adjectives)
+        else:
+            phrase_dict['adverb'] = [adjectives.strip()]
     phrase_dict['noun'] = noun_phrase
 
     # get verb type
