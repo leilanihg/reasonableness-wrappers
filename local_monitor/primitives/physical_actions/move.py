@@ -57,7 +57,7 @@ class Move(PhysicalAction):
         return True
 
     def check_weather_constraints(self):
-        if self.context == None:
+        if self.context == None or len(self.context) == 0:
             return False
 
         self.support = []

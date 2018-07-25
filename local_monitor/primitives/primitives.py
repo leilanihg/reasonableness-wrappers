@@ -27,13 +27,17 @@ class ACT:
         self.phrases = phrases
         self.world = None
         if 'preposition' in phrases:
-            print("setting the prepositions")
+            log.debug("setting the prepositions")
             self.pp = phrases['preposition']
         else:
             self.pp = None
         self.verbose = verbose # default is false
         self.light = None # Special case for the vehicle, may want to change
     
+    def remove_dups(self):
+        removed = list(set(self.support))
+        self.support = removed
+
     # if give a name, it returns a person anchor
     def clean_name(self, subject):
         if subject == None:
@@ -64,6 +68,7 @@ class ACT:
             print("\n")
             print("This perception is reasonable")
             print("=============================================")
+            self.remove_dups()
             for element in self.support:
                 print(element)
             print("So it is reasonable for", self.summary())
@@ -163,42 +168,6 @@ class ATrans(StateChange):
         return self.subject.join("changes abstraction relationship of a physical object")
         print(self.subject, "changes physical position or location")
 
-# # Another specific vehicle type primitive
-# class Wait(Move):
-#     def check_constraints(self):
-#         consistent = False
-#         if self.pp:
-#             for context in self.pp:
-#                 if 'green light' in context:
-#                     self.light = 'green'
-#                     self.violations.append("A green light means go, which is inconsistent with waiting.")
-#                     consistent = False
-#                 elif 'red light' in context:
-#                     self.light = 'red'
-#                     self.support.append("A red light means stop.")
-#                     consistent = True
-#                 elif 'yellow light' in context:
-#                     self.light = 'yellow'
-#                     self.support.append("A yellow light means 'stop if safe'.  So waiting is reasonable")
-#                     consistent = True
-#                 if 'pedestrian' in context:
-#                     if self.light is 'green':
-#                         self.support.append("Although green means go, green also means yields to pedestiran in the road.")
-#                     self.support.append("Since there is a pedestrian in the road, waiting is reasonable.")
-#                     consistent = True
-#         print("consistent is", consistent)
-#         return consistent 
-
-#     def check_subject_constraints(self):
-#         return False
-
-# # Another specific vehicle type primitive
-# class Yield(Move):
-#     def check_constraints(self):
-#         return False
-
-#     def check_subject_constraints(self):
-#         return False
 
 
 # TODO change MOVE to be itself or body, and use PROPEL instead ("a man moves a hurricane", should be propel)
