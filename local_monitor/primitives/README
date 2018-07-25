@@ -21,4 +21,5 @@ python3 -m tests.test.py
 
 To run reasonability tests:
 Run from the PARENT directory (local_monitor):
-python 3 -m primitives.test.test.py
+python3 -m primitives.test.test_name (for single test)
+python3 -m primitives.test.test (for all tests)
